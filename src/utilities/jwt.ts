@@ -8,6 +8,11 @@ export function sign(payload: object) {
   });
 }
 
-export function verify(token: string) {
-  return jwt.verify(token, JWT_SECRET);
+export function verify(token: string): object | null {
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    return typeof payload === "object" ? payload : null;
+  } catch (error) {
+    return null;
+  }
 }

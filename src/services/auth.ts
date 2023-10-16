@@ -1,5 +1,5 @@
 import { prisma } from "prisma";
-import * as user from "./user";
+import * as users from "./user";
 import * as jwt from "@/utilities/jwt";
 
 export async function signIn(input: {
@@ -12,10 +12,10 @@ export async function signIn(input: {
     throw new Error("공급자 정보를 제공해야 합니다.");
   }
 
-  const foundUser = await user
+  const foundUser = await users
     .findByProvider(input.provider, input.providerId)
     .then((node) => node ?? prisma.user.create({ data: input }))
-    .then((node) => user.sync(node.id));
+    .then((node) => users.sync(node.id));
 
   return {
     accessToken: jwt.sign({ id: foundUser.id }),

@@ -1,6 +1,7 @@
 import URLPattern from "url-pattern";
 
 import router from "./controllers";
+import { tryCatch } from "./utilities/tryCatch";
 
 const PORT = 8080;
 
@@ -12,9 +13,16 @@ Bun.serve({
 
     for (const [route, handler] of Object.entries(router)) {
       const pattern = new URLPattern(route);
-      if (pattern.match(url.pathname)) {
+      const param = pattern.match(url.pathname);
+      const body = await tryCatch(() => request.json());
+      if (param) {
         try {
-          return await handler(request);
+          return await handler({
+            param,
+            query: Object.fromEntries(url.searchParams.entries()),
+            body: body || {},
+            request,
+          });
         } catch (error) {
           console.log(error);
           if (error instanceof Error) {

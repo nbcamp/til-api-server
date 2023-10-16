@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type PrimitiveTypeKind = "number" | "string" | "boolean" | "any";
 export type NullableType<T extends string> = `${T} nullable`;
 export type OptionalType<T extends string> = `${T} optional`;
@@ -13,7 +12,7 @@ export type TypeDescriptor =
   | OptionalType<PrimitiveTypeKind | NullableType<PrimitiveTypeKind>>
   | ObjectTypeDescriptor;
 
-type InferType<T> = T extends PrimitiveTypeKind
+export type InferType<T> = T extends PrimitiveTypeKind
   ? InferPrimitive<T>
   : T extends NullableType<infer P>
   ? P extends PrimitiveTypeKind

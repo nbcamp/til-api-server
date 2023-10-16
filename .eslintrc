@@ -19,11 +19,12 @@
   "plugins": ["import", "@typescript-eslint", "prettier"],
   "ignorePatterns": ["node_modules/", "tsconfig.json"],
   "rules": {
+    "prettier/prettier": "warn",
     "no-undef": "off",
     "no-unused-vars": "off",
+    "no-redeclare": "off",
     "@typescript-eslint/no-unused-vars": "warn",
-    "@typescript-eslint/no-explicit-any": "off",
-    "prettier/prettier": ["error", {}]
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "settings": {
     "import/resolver": {
