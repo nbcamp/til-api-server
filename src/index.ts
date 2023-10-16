@@ -1,7 +1,8 @@
 import URLPattern from "url-pattern";
 
-import router from "./controllers";
+import router from "./router";
 import { tryCatch } from "./utilities/tryCatch";
+import { response } from "./utilities/response";
 
 const PORT = 8080;
 
@@ -17,23 +18,25 @@ Bun.serve({
       const body = await tryCatch(() => request.json());
       if (param) {
         try {
-          return await handler({
+          const result = await handler({
             param,
             query: Object.fromEntries(url.searchParams.entries()),
             body: body || {},
             request,
           });
+          return response(result, "OK");
         } catch (error) {
-          console.log(error);
-          if (error instanceof Error) {
-            return new Response(error.message, { status: 500 });
-          }
-          return new Response("Internal server error", { status: 500 });
+          return error instanceof Error
+            ? response({ error: error.message }, "INTERNAL_SERVER_ERROR")
+            : response(
+                { error: "Internal Server Error" },
+                "INTERNAL_SERVER_ERROR",
+              );
         }
       }
     }
 
-    return new Response("Not found", { status: 404 });
+    return response({ error: "Not Found" }, "NOT_FOUND");
   },
 });
 
