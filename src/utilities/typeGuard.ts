@@ -41,10 +41,10 @@ type InferPrimitive<T> = T extends "number"
   ? any
   : never;
 
-export const typeGuard = <T extends TypeDescriptor>(
+export function typeGuard<T extends TypeDescriptor>(
   value: unknown,
   descriptor: T,
-): value is InferType<T> => {
+): value is InferType<T> {
   if (typeof descriptor === "string") {
     return typeGuardPrimitive(value, descriptor);
   }
@@ -54,26 +54,26 @@ export const typeGuard = <T extends TypeDescriptor>(
   }
 
   return false;
-};
+}
 
-const typeGuardPrimitive = <T>(
+function typeGuardPrimitive<T>(
   value: unknown,
   kind:
     | PrimitiveTypeKind
     | NullableType<PrimitiveTypeKind>
     | OptionalType<PrimitiveTypeKind | NullableType<PrimitiveTypeKind>>,
-): value is T => {
+): value is T {
   const [typeKind, attribute] = kind.split(" ");
   const isValidType = typeof value === typeKind;
   if (attribute === "nullable") return isValidType || value === null;
   if (attribute === "optional") return isValidType || value === undefined;
   return isValidType;
-};
+}
 
-const typeGuardObject = <T>(
+function typeGuardObject<T>(
   value: unknown,
   descriptor: ObjectTypeDescriptor,
-): value is T => {
+): value is T {
   if (typeof value !== "object" || value === null) {
     return false;
   }
@@ -98,4 +98,4 @@ const typeGuardObject = <T>(
   }
 
   return true;
-};
+}

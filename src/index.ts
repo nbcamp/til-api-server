@@ -13,7 +13,15 @@ Bun.serve({
     for (const [route, handler] of Object.entries(router)) {
       const pattern = new URLPattern(route);
       if (pattern.match(url.pathname)) {
-        return await handler(request);
+        try {
+          return await handler(request);
+        } catch (error) {
+          console.log(error);
+          if (error instanceof Error) {
+            return new Response(error.message, { status: 500 });
+          }
+          return new Response("Internal server error", { status: 500 });
+        }
       }
     }
 

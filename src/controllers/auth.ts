@@ -1,4 +1,5 @@
 import { signIn } from "@/services/auth";
+import { response } from "@/utilities/response";
 import { typeGuard } from "@/utilities/typeGuard";
 
 export default {
@@ -12,12 +13,9 @@ export default {
         providerId: "string nullable",
       })
     ) {
-      return new Response(
-        JSON.stringify({ error: "올바르지 않은 요청입니다." }),
-        { status: 400 },
-      );
+      return response({ error: "올바르지 않은 요청입니다" }, "BAD_REQUEST");
     }
     const result = await signIn(payload);
-    return new Response(JSON.stringify(result), { status: 200 });
+    return response(result, "OK");
   },
 };

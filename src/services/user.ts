@@ -1,6 +1,6 @@
 import { prisma } from "prisma";
 
-export const findByProvider = async (provider: string, providerId: string) => {
+export async function findByProvider(provider: string, providerId: string) {
   return prisma.user.findUnique({
     where: {
       provider_providerId: {
@@ -9,13 +9,13 @@ export const findByProvider = async (provider: string, providerId: string) => {
       },
     },
   });
-};
+}
 
-export const sync = async (id: number) => {
+export async function sync(id: number) {
   return prisma.user.update({
     where: { id },
     data: {
       lastSignedAt: new Date(),
     },
   });
-};
+}
