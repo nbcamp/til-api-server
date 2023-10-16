@@ -9,10 +9,16 @@
     "noEmit": true,
     "composite": true,
     "strict": true,
+    "noImplicitReturns": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "prisma": ["./src/prisma.ts"],
+      "@/*": ["./src/*"],
+    },
     "types": [
       "bun-types"
     ]

@@ -1,0 +1,2 @@
+export DATABASE_URL="file:./dev.db"
+export JWT_SECRET=""
