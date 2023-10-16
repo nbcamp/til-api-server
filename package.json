@@ -2,8 +2,19 @@
   "name": "til-api-server",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start:dev": "bun run index.ts",
+    "lint": "eslint --ext .ts ."
+  },
   "devDependencies": {
-    "bun-types": "latest"
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "@typescript-eslint/parser": "^6.7.5",
+    "bun-types": "latest",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.0.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
