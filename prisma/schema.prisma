@@ -45,7 +45,7 @@ model Blog {
 
 model Post {
   id          Int      @id @default(autoincrement())
-  blog        Blog     @relation(fields: [blogId], references: [id])
+  blog        Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId      Int      @map("blog_id")
   title       String
   description String

@@ -39,6 +39,18 @@ export function update(
   return prisma.user.update({ where: { id }, data: input });
 }
 
+export async function remove(id: number) {
+  await prisma.$transaction(async (tx) => {
+    await tx.blog.deleteMany({ where: { ownerId: id } });
+    return tx.user.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+  });
+}
+
 export function sync(id: number) {
   return prisma.user.update({
     where: { id },

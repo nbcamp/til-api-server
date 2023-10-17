@@ -62,10 +62,17 @@ function typeGuardPrimitive<T>(
     | NullableType<PrimitiveTypeKind>
     | OptionalType<PrimitiveTypeKind | NullableType<PrimitiveTypeKind>>,
 ): value is T {
-  const [typeKind, attribute] = kind.split(" ");
+  const [typeKind, ...attributes] = kind.split(" ");
   const isValidType = typeof value === typeKind;
-  if (attribute === "nullable") return isValidType || value === null;
-  if (attribute === "optional") return isValidType || value === undefined;
+  const nullable = attributes.includes("nullable");
+  const optional = attributes.includes("optional");
+  if (optional && nullable) {
+    return isValidType || value === undefined || value === null;
+  } else if (optional) {
+    return isValidType || value === undefined;
+  } else if (nullable) {
+    return isValidType || value === null;
+  }
   return isValidType;
 }
 
