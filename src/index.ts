@@ -5,7 +5,7 @@ import { tryCatch } from "./utilities/tryCatch";
 import { response } from "./utilities/response";
 import { HttpError } from "./utilities/error";
 
-const PORT = 8080;
+const PORT = +(Bun.env.PORT || 3000);
 
 Bun.serve({
   port: PORT,

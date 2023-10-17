@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jinyongp/til-api
+    container_name: api.til.local
+    environment:
+      - NODE_ENV=develpment
+      - PORT=3000
+      - TZ=Asia/Seoul
+    ports:
+      - "3000:3000"

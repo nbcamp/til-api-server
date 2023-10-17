@@ -1,2 +1,6 @@
+export PORT="3000"
+export NODE_ENV="local"
+export TZ="Asia/Seoul"
+
 export DATABASE_URL="file:./dev.db"
 export JWT_SECRET=""

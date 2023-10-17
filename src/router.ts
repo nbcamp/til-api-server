@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { InferType, TypeDescriptor, typeGuard } from "@/guards/typeGuard";
 import { HttpError } from "@/utilities/error";
-import { User } from "@prisma/client";
+import { User } from "./prisma/generated";
 import * as jwt from "services/jwt";
 import * as users from "services/users";
 
@@ -98,7 +98,7 @@ async function makeFileSystemBasedRouterMap(dir: string): Promise<AnyRouter[]> {
 
   const routers: AnyRouter[][] = await Promise.all(
     filenames.map(async (filename) => {
-      const route = `/${filename.replace(/(\/index)?\.ts$/, "")}`;
+      const route = `/${filename.replace(/(\/?index)?\.ts$/, "")}`;
       const imported: { [route: string]: AnyRouter } = await import(
         path.resolve(controllers, filename)
       );

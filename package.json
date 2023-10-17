@@ -1,12 +1,20 @@
 {
   "name": "til-api-server",
-  "module": "index.ts",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "bun run src/index.ts",
+    "start:prod": "NODE_ENV=production bun run src/index.ts",
     "start:dev": "bun --hot run src/index.ts",
+    "postinstall": "prisma generate",
     "migrate:dev": "prisma migrate dev",
     "lint": "eslint --ext .ts ."
+  },
+  "dependencies": {
+    "@prisma/client": "^5.4.2",
+    "fast-glob": "^3.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^5.4.2",
+    "url-pattern": "^1.0.3"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.3",
@@ -23,11 +31,7 @@
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "dependencies": {
-    "@prisma/client": "^5.4.2",
-    "fast-glob": "^3.3.1",
-    "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.4.2",
-    "url-pattern": "^1.0.3"
-  }
+  "trustedDependencies": [
+    "@prisma/client"
+  ]
 }
