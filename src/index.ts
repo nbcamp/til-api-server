@@ -1,8 +1,9 @@
 import URLPattern from "url-pattern";
 
-import router from "router";
+import routers from "router";
 import { tryCatch } from "./utilities/tryCatch";
 import { response } from "./utilities/response";
+import { HttpError } from "./utilities/error";
 
 const PORT = 8080;
 
@@ -11,7 +12,7 @@ Bun.serve({
   development: true,
   async fetch(request) {
     const url = new URL(request.url);
-    for (const [route, { method, handler }] of Object.entries(router)) {
+    for (const { route, method, handler } of routers) {
       const pattern = new URLPattern(route);
       const param = pattern.match(url.pathname);
       if (param && method === request.method) {
@@ -26,6 +27,9 @@ Bun.serve({
           return response(result, "OK");
         } catch (error) {
           console.error(error);
+          if (error instanceof HttpError) {
+            return response({ error: error.message }, error.status);
+          }
           return response(
             { error: "Internal Server Error" },
             "INTERNAL_SERVER_ERROR",

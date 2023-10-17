@@ -30,14 +30,16 @@ model Blog {
   id             Int              @id @default(autoincrement())
   owner          User             @relation(fields: [ownerId], references: [id])
   ownerId        Int              @map("owner_id")
-  name           String           @unique
+  name           String
   url            String
   rss            String
+  primary        Boolean          @default(false)
   Post           Post[]
   KeywordTagPair KeywordTagPair[]
   createdAt      DateTime         @default(now()) @map("created_at")
   updatedAt      DateTime         @updatedAt @map("updated_at")
 
+  @@unique([ownerId, name], map: "ownerNameIndex")
   @@map("blogs")
 }
 

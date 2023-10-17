@@ -78,7 +78,6 @@ function typeGuardObject<T>(
   }
 
   for (const key of Object.keys(descriptor)) {
-    if (!(key in value)) return false;
     const kind = descriptor[key];
 
     if (

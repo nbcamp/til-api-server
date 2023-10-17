@@ -1,4 +1,4 @@
-const HttpStatusCode = {
+export const HttpStatusCode = {
   OK: 200,
   CREATED: 201,
 
@@ -7,10 +7,12 @@ const HttpStatusCode = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
 
+  CONFLICT: 409,
+
   INTERNAL_SERVER_ERROR: 500,
 };
 
-type Status = keyof typeof HttpStatusCode;
+export type Status = keyof typeof HttpStatusCode;
 
 export function response(data: object, status: Status): Response {
   const code = HttpStatusCode[status];

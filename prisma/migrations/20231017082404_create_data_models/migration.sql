@@ -18,6 +18,7 @@ CREATE TABLE "blogs" (
     "name" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "rss" TEXT NOT NULL,
+    "primary" BOOLEAN NOT NULL DEFAULT false,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
     CONSTRAINT "blogs_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
@@ -57,7 +58,7 @@ CREATE TABLE "keyword_tag_pairs" (
 CREATE UNIQUE INDEX "providerIndex" ON "users"("provider", "provider_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "blogs_name_key" ON "blogs"("name");
+CREATE UNIQUE INDEX "ownerNameIndex" ON "blogs"("owner_id", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "keywordTagIndex" ON "keyword_tag_pairs"("keyword", "tag_id");

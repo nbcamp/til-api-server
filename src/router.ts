@@ -7,29 +7,29 @@ import { User } from "@prisma/client";
 import * as jwt from "services/jwt";
 import * as users from "services/users";
 
-export type Body = { [key: string]: any };
+type Body = { [key: string]: any };
 
-export type Context<TBody extends Body = Body> = {
+type Context<TBody extends Body = Body> = {
   param: { [key: string]: string };
   query: { [key: string]: string };
   body: TBody;
   request: Request;
 };
 
-export type AuthContext<TBody extends Body> = Context<TBody> & {
+type AuthContext<TBody extends Body> = Context<TBody> & {
   auth: {
     token: string;
     user: User;
   };
 };
 
-export type Result = Record<string, any>;
+type Result = Record<string, any>;
 
-export type Handler<TContext extends Context = Context> = (
+type Handler<TContext extends Context = Context> = (
   context: TContext,
 ) => Result | Promise<Result>;
 
-export type Router<
+type Router<
   Descriptor extends TypeDescriptor,
   TBody extends Body = InferType<Descriptor>,
 > = {
@@ -47,8 +47,10 @@ export type Router<
     }
 );
 
-export type AnyRouter = Router<any> & {
-  handler: Handler<Context>;
+type AnyRouter = {
+  route: string;
+  method: string;
+  handler: Handler;
 };
 
 export function createRouter<Descriptor extends TypeDescriptor = never>(
@@ -90,30 +92,28 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
   };
 }
 
-async function makeFileSystemBasedRouterMap(dir: string) {
+async function makeFileSystemBasedRouterMap(dir: string): Promise<AnyRouter[]> {
   const controllers = path.resolve(__dirname, dir);
   const filenames = await glob("**/*.ts", { cwd: controllers });
 
-  const routers: {
-    route: string;
-    router: AnyRouter;
-  }[] = await Promise.all(
+  const routers: AnyRouter[][] = await Promise.all(
     filenames.map(async (filename) => {
-      const route = `/${filename.replace(/\.ts$/, "")}`;
-      const { default: router } = await import(
+      const route = `/${filename.replace(/(\/index)?\.ts$/, "")}`;
+      const imported: { [route: string]: AnyRouter } = await import(
         path.resolve(controllers, filename)
       );
-      if (!router) {
+      if (!imported) {
         throw new Error(`Router must be exported as default from ${filename}`);
       }
-      return { route, router };
+      return Object.values(imported).map((router) => ({
+        route,
+        method: router.method ?? "GET",
+        handler: router.handler,
+      }));
     }),
   );
 
-  return routers.reduce<{ [route: string]: AnyRouter }>(
-    (acc, { route, router }) => ({ ...acc, [route]: router }),
-    {},
-  );
+  return routers.flat();
 }
 
 export default await makeFileSystemBasedRouterMap("controllers");
