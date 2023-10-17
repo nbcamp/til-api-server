@@ -28,6 +28,7 @@ export type Handler<TContext extends Context = Context> = (
 ) => Result | Promise<Result>;
 
 export type Router<Descriptor extends TypeDescriptor> = {
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   descriptor?: Descriptor;
   authorized?: boolean;
 } & (
@@ -41,30 +42,38 @@ export type Router<Descriptor extends TypeDescriptor> = {
     }
 );
 
+export type AnyRouter = Router<any> & {
+  handler: Handler<Context>;
+};
+
 export function createRouter<Descriptor extends TypeDescriptor>(
   router: Router<Descriptor>,
-): Handler {
-  return (context) => {
-    if (router.descriptor && !typeGuard(context.body, router.descriptor)) {
-      throw new HttpError("요청 정보가 올바르지 않습니다.", "BAD_REQUEST");
-    }
+): Router<Descriptor> {
+  return {
+    ...router,
+    method: router.method ?? "GET",
+    handler(context) {
+      if (router.descriptor && !typeGuard(context.body, router.descriptor)) {
+        throw new HttpError("요청 정보가 올바르지 않습니다.", "BAD_REQUEST");
+      }
 
-    if (router.authorized) {
-      const authorization = context.request.headers.get("Authorization");
-      const [tokenType, token] = authorization?.split(" ") ?? [];
-      if (tokenType !== "Bearer" || !token) {
-        throw new HttpError("로그인이 필요합니다.", "UNAUTHORIZED");
+      if (router.authorized) {
+        const authorization = context.request.headers.get("Authorization");
+        const [tokenType, token] = authorization?.split(" ") ?? [];
+        if (tokenType !== "Bearer" || !token) {
+          throw new HttpError("로그인이 필요합니다.", "UNAUTHORIZED");
+        }
+        const payload = jwt.verify(token);
+        if (!payload || !("id" in payload) || typeof payload.id !== "number") {
+          throw new HttpError("인증 정보가 올바르지 않습니다.", "UNAUTHORIZED");
+        }
+        Reflect.set(context, "auth", {
+          token,
+          userId: payload.id,
+        });
       }
-      const payload = jwt.verify(token);
-      if (!payload || !("id" in payload) || typeof payload.id !== "number") {
-        throw new HttpError("인증 정보가 올바르지 않습니다.", "UNAUTHORIZED");
-      }
-      Reflect.set(context, "auth", {
-        token,
-        userId: payload.id,
-      });
-    }
-    return router.handler(context as any);
+      return router.handler(context as any);
+    },
   };
 }
 
@@ -74,19 +83,22 @@ async function makeFileSystemBasedRouterMap(dir: string) {
 
   const routers: {
     route: string;
-    handler: Handler;
+    router: AnyRouter;
   }[] = await Promise.all(
     filenames.map(async (filename) => {
       const route = `/${filename.replace(/\.ts$/, "")}`;
-      const { default: handler } = await import(
+      const { default: router } = await import(
         path.resolve(controllers, filename)
       );
-      return { route, handler };
+      if (!router) {
+        throw new Error(`Router must be exported as default from ${filename}`);
+      }
+      return { route, router };
     }),
   );
 
-  return routers.reduce<{ [route: string]: Handler }>(
-    (acc, { route, handler }) => ({ ...acc, [route]: handler }),
+  return routers.reduce<{ [route: string]: AnyRouter }>(
+    (acc, { route, router }) => ({ ...acc, [route]: router }),
     {},
   );
 }

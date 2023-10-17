@@ -2,6 +2,7 @@ import { createRouter } from "router";
 import { signIn } from "@/services/auth";
 
 export default createRouter({
+  method: "POST",
   descriptor: {
     username: "string nullable",
     profileUrl: "string nullable",

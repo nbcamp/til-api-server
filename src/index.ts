@@ -11,17 +11,15 @@ Bun.serve({
   development: true,
   async fetch(request) {
     const url = new URL(request.url);
-
-    for (const [route, handler] of Object.entries(router)) {
+    for (const [route, { method, handler }] of Object.entries(router)) {
       const pattern = new URLPattern(route);
       const param = pattern.match(url.pathname);
-      const body = await tryCatch(() => request.json());
-      if (param) {
+      if (param && method === request.method) {
         try {
           const result = await handler({
             param,
             query: Object.fromEntries(url.searchParams.entries()),
-            body: body || {},
+            body: (await tryCatch(() => request.json())) || {},
             request,
           });
           return response(result, "OK");
