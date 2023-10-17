@@ -40,10 +40,10 @@ type InferPrimitive<T> = T extends "number"
   ? any
   : never;
 
-export function typeGuard<T extends TypeDescriptor>(
+export function typeGuard<Descriptor extends TypeDescriptor>(
   value: unknown,
-  descriptor: T,
-): value is InferType<T> {
+  descriptor: Descriptor,
+): value is InferType<Descriptor> {
   if (typeof descriptor === "string") {
     return typeGuardPrimitive(value, descriptor);
   }

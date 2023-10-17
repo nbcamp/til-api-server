@@ -17,6 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "prisma": ["./src/prisma.ts"],
+      "router": ["./src/router.ts"],
       "@/*": ["./src/*"],
     },
     "types": [

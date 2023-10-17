@@ -1,13 +1,14 @@
-import { Guard } from "@/guards";
+import { createRouter } from "router";
 import { signIn } from "@/services/auth";
 
-export default new Guard()
-  .payload({
+export default createRouter({
+  descriptor: {
     username: "string nullable",
     profileUrl: "string nullable",
     provider: "string nullable",
     providerId: "string nullable",
-  })
-  .build((context) => {
+  },
+  async handler(context) {
     return signIn(context.body);
-  });
+  },
+});

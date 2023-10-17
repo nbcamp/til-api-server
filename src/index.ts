@@ -1,6 +1,6 @@
 import URLPattern from "url-pattern";
 
-import router from "./router";
+import router from "router";
 import { tryCatch } from "./utilities/tryCatch";
 import { response } from "./utilities/response";
 
