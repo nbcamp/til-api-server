@@ -13,7 +13,7 @@ datasource db {
 model User {
   id           Int       @id @default(autoincrement())
   username     String?
-  profileUrl   String?   @map("profile_url")
+  avatarUrl    String?   @map("avatar_url")
   provider     String?
   providerId   String?   @map("provider_id")
   Blog         Blog[]
@@ -30,7 +30,7 @@ model Blog {
   id             Int              @id @default(autoincrement())
   owner          User             @relation(fields: [ownerId], references: [id])
   ownerId        Int              @map("owner_id")
-  name           String
+  name           String           @unique
   url            String
   rss            String
   Post           Post[]

@@ -2,7 +2,7 @@ import { prisma } from "prisma";
 
 export async function findById(id: number) {
   return prisma.user.findUnique({
-    where: { id },
+    where: { id, deletedAt: null },
   });
 }
 
@@ -13,11 +13,33 @@ export async function findByProvider(provider: string, providerId: string) {
         provider,
         providerId,
       },
+      deletedAt: null,
     },
   });
 }
 
-export async function sync(id: number) {
+export function create(input: {
+  username: string | null;
+  avatarUrl: string | null;
+  provider: string | null;
+  providerId: string | null;
+}) {
+  return prisma.user.create({
+    data: { ...input },
+  });
+}
+
+export function update(
+  id: number,
+  input: {
+    name?: string | null;
+    avatarUrl?: string | null;
+  },
+) {
+  return prisma.user.update({ where: { id }, data: input });
+}
+
+export function sync(id: number) {
   return prisma.user.update({
     where: { id },
     data: {

@@ -3,7 +3,9 @@ import path from "node:path";
 
 import { InferType, TypeDescriptor, typeGuard } from "@/guards/typeGuard";
 import { HttpError } from "@/utilities/error";
-import * as jwt from "@/utilities/jwt";
+import { User } from "@prisma/client";
+import * as jwt from "services/jwt";
+import * as users from "services/users";
 
 export type Body = { [key: string]: any };
 
@@ -17,7 +19,7 @@ export type Context<TBody extends Body = Body> = {
 export type AuthContext<TBody extends Body> = Context<TBody> & {
   auth: {
     token: string;
-    userId: number;
+    user: User;
   };
 };
 
@@ -27,18 +29,21 @@ export type Handler<TContext extends Context = Context> = (
   context: TContext,
 ) => Result | Promise<Result>;
 
-export type Router<Descriptor extends TypeDescriptor> = {
+export type Router<
+  Descriptor extends TypeDescriptor,
+  TBody extends Body = InferType<Descriptor>,
+> = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   descriptor?: Descriptor;
   authorized?: boolean;
 } & (
   | {
       authorized: true;
-      handler: Handler<AuthContext<InferType<Descriptor>>>;
+      handler: Handler<AuthContext<TBody>>;
     }
   | {
       authorized?: false;
-      handler: Handler<Context<InferType<Descriptor>>>;
+      handler: Handler<Context<TBody>>;
     }
 );
 
@@ -46,13 +51,13 @@ export type AnyRouter = Router<any> & {
   handler: Handler<Context>;
 };
 
-export function createRouter<Descriptor extends TypeDescriptor>(
+export function createRouter<Descriptor extends TypeDescriptor = never>(
   router: Router<Descriptor>,
 ): Router<Descriptor> {
   return {
     ...router,
     method: router.method ?? "GET",
-    handler(context) {
+    async handler(context) {
       if (router.descriptor && !typeGuard(context.body, router.descriptor)) {
         throw new HttpError("요청 정보가 올바르지 않습니다.", "BAD_REQUEST");
       }
@@ -67,9 +72,17 @@ export function createRouter<Descriptor extends TypeDescriptor>(
         if (!payload || !("id" in payload) || typeof payload.id !== "number") {
           throw new HttpError("인증 정보가 올바르지 않습니다.", "UNAUTHORIZED");
         }
+        const user = await users.findById(payload.id);
+        if (!user) {
+          throw new HttpError(
+            "사용자 정보를 찾을 수 없습니다.",
+            "UNAUTHORIZED",
+          );
+        }
+
         Reflect.set(context, "auth", {
           token,
-          userId: payload.id,
+          user,
         });
       }
       return router.handler(context as any);

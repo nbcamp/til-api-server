@@ -2,7 +2,7 @@
 CREATE TABLE "users" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "username" TEXT,
-    "profile_url" TEXT,
+    "avatar_url" TEXT,
     "provider" TEXT,
     "provider_id" TEXT,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -55,6 +55,9 @@ CREATE TABLE "keyword_tag_pairs" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "providerIndex" ON "users"("provider", "provider_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "blogs_name_key" ON "blogs"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "keywordTagIndex" ON "keyword_tag_pairs"("keyword", "tag_id");

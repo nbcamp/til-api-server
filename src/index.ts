@@ -16,20 +16,20 @@ Bun.serve({
       const param = pattern.match(url.pathname);
       if (param && method === request.method) {
         try {
+          const body = await tryCatch(() => request.json());
           const result = await handler({
             param,
             query: Object.fromEntries(url.searchParams.entries()),
-            body: (await tryCatch(() => request.json())) || {},
+            body: body || {},
             request,
           });
           return response(result, "OK");
         } catch (error) {
-          return error instanceof Error
-            ? response({ error: error.message }, "INTERNAL_SERVER_ERROR")
-            : response(
-                { error: "Internal Server Error" },
-                "INTERNAL_SERVER_ERROR",
-              );
+          console.error(error);
+          return response(
+            { error: "Internal Server Error" },
+            "INTERNAL_SERVER_ERROR",
+          );
         }
       }
     }

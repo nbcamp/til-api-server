@@ -18,6 +18,8 @@
     "paths": {
       "prisma": ["./src/prisma.ts"],
       "router": ["./src/router.ts"],
+      "controllers/*": ["./src/controllers/*"],
+      "services/*": ["./src/services/*"],
       "@/*": ["./src/*"],
     },
     "types": [
