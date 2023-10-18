@@ -5,6 +5,10 @@ on:
     branches:
       - main
     paths:
+      - 'package.json'
+      - 'bun.lockb'
+      - 'tsconfig.json'
+      - 'Dockerfile'
       - 'prisma/**'
       - 'src/**'
   workflow_dispatch:
@@ -26,11 +30,6 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
-          secrets: |
-            "NODE_ENV=${{ secrets.NOD_ENV }}"
-            "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-            "JWT_SECRET=${{ secrets.JWT_SECRET }}"
-            "TZ=${{ secrets.TZ }}"
 
       - name: Deploy Docker to EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -38,8 +37,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          allenvs: true
           script: |
-            sudo docker-compose pull
-            sudo docker-compose down
-            sudo docker-compose up -d
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
+            sudo docker stop ${{ secrets.DOCKER_IMAGE }} || true
+            sudo docker rm ${{ secrets.DOCKER_IMAGE }} || true
+            sudo docker run -d --name ${{ secrets.DOCKER_IMAGE }} \
+              -p ${{ secrets.PORT }}:${{ secrets.PORT }} --restart always \
+              ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
