@@ -6,6 +6,7 @@
     "start:prod": "NODE_ENV=production bun run src/index.ts",
     "start:dev": "bun --hot run src/index.ts",
     "postinstall": "prisma generate",
+    "migrate": "prisma migrate deploy",
     "migrate:dev": "prisma migrate dev",
     "lint": "eslint --ext .ts ."
   },

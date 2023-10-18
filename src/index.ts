@@ -7,10 +7,15 @@ import { HttpError } from "./utilities/error";
 
 const PORT = +(Bun.env.PORT || 3000);
 
+function logger(request: Request) {
+  console.log(`[${request.method}] ${request.url}`);
+}
+
 Bun.serve({
   port: PORT,
   development: true,
   async fetch(request) {
+    logger(request);
     const url = new URL(request.url);
     for (const { route, method, handler } of routers) {
       const pattern = new URLPattern(route);
@@ -37,7 +42,6 @@ Bun.serve({
         }
       }
     }
-
     return response({ error: "Not Found" }, "NOT_FOUND");
   },
 });
