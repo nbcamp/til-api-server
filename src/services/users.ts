@@ -41,7 +41,7 @@ export function update(
 
 export async function remove(id: number) {
   await prisma.$transaction(async (tx) => {
-    await tx.blog.deleteMany({ where: { ownerId: id } });
+    await tx.blog.deleteMany({ where: { userId: id } });
     return tx.user.update({
       where: { id },
       data: {

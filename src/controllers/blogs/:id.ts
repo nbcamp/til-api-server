@@ -22,7 +22,7 @@ export const UPDATE = createRouter({
     const result = await blogs.update(+ctx.param.id, {
       name: ctx.body.name,
       primary: ctx.body.primary,
-      ownerId: ctx.auth.user.id,
+      userId: ctx.auth.user.id,
     });
     return {
       id: result.id,

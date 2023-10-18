@@ -14,14 +14,14 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "blogs" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "owner_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "rss" TEXT NOT NULL,
     "primary" BOOLEAN NOT NULL DEFAULT false,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "blogs_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "blogs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -58,7 +58,7 @@ CREATE TABLE "keyword_tag_pairs" (
 CREATE UNIQUE INDEX "providerIndex" ON "users"("provider", "provider_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ownerNameIndex" ON "blogs"("owner_id", "name");
+CREATE UNIQUE INDEX "userNameIndex" ON "blogs"("user_id", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "keywordTagIndex" ON "keyword_tag_pairs"("keyword", "tag_id");

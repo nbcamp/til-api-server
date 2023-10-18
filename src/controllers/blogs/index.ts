@@ -4,7 +4,7 @@ import * as blogs from "services/blogs";
 export default createRouter({
   authorized: true,
   async handler(ctx) {
-    const list = await blogs.findAllByOwnerId(ctx.auth.user.id);
+    const list = await blogs.findAllByUserId(ctx.auth.user.id);
     return {
       items: list.map((blog) => ({
         id: blog.id,
@@ -29,7 +29,7 @@ export const CREATE = createRouter({
   async handler(ctx) {
     const result = await blogs.create({
       ...ctx.body,
-      ownerId: ctx.auth.user.id,
+      userId: ctx.auth.user.id,
     });
     return {
       id: result.id,

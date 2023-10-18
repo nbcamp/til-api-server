@@ -1,30 +1,30 @@
 import { HttpError } from "@/utilities/error";
 import { prisma } from "prisma";
 
-export function findAllByOwnerId(ownerId: number) {
-  return prisma.blog.findMany({ where: { ownerId } });
+export function findAllByUserId(userId: number) {
+  return prisma.blog.findMany({ where: { userId } });
 }
 
-export function findPrimaryByOwnerId(ownerId: number) {
-  return prisma.blog.findFirst({ where: { ownerId, primary: true } });
+export function findPrimaryByUserId(userId: number) {
+  return prisma.blog.findFirst({ where: { userId, primary: true } });
 }
 
 export function findOneById(id: number) {
   return prisma.blog.findFirst({ where: { id } });
 }
 
-export function countOfBlogsByOwnerId(ownerId: number) {
-  return prisma.blog.count({ where: { ownerId } });
+export function countOfBlogsByUserId(userId: number) {
+  return prisma.blog.count({ where: { userId } });
 }
 
 export async function create(input: {
-  ownerId: number;
+  userId: number;
   name: string;
   url: string;
   rss: string;
 }) {
-  throwIfDuplicateName(input.ownerId, input.name);
-  const count = await countOfBlogsByOwnerId(input.ownerId);
+  throwIfDuplicateName(input.userId, input.name);
+  const count = await countOfBlogsByUserId(input.userId);
   return prisma.blog.create({
     data: {
       ...input,
@@ -38,14 +38,14 @@ export async function update(
   input: {
     name?: string;
     primary?: boolean;
-    ownerId: number;
+    userId: number;
   },
 ) {
   if (input.name) {
-    throwIfDuplicateName(input.ownerId, input.name);
+    throwIfDuplicateName(input.userId, input.name);
   }
   if (input.primary) {
-    const blog = await findPrimaryByOwnerId(input.ownerId);
+    const blog = await findPrimaryByUserId(input.userId);
     if (blog) {
       await prisma.blog.update({
         where: { id: blog.id },
@@ -64,8 +64,8 @@ export async function remove(id: number) {
   return prisma.blog.delete({ where: { id } });
 }
 
-async function throwIfDuplicateName(ownerId: number, name: string) {
-  const blog = await prisma.blog.findFirst({ where: { ownerId, name } });
+async function throwIfDuplicateName(userId: number, name: string) {
+  const blog = await prisma.blog.findFirst({ where: { userId, name } });
   if (blog) {
     throw new HttpError(
       "블로그 이름은 중복으로 생성할 수 없습니다.",
