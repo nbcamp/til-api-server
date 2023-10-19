@@ -1,7 +1,7 @@
 import glob from "fast-glob";
 import path from "node:path";
 
-import { InferType, TypeDescriptor, typeGuard } from "@/guards/typeGuard";
+import { InferType, TypeDescriptor, validate } from "@/guards/type-guard";
 import { HttpError } from "@/utilities/error";
 import { User } from "./prisma/generated";
 import * as jwt from "services/jwt";
@@ -60,8 +60,15 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
     ...router,
     method: router.method ?? "GET",
     async handler(context) {
-      if (router.descriptor && !typeGuard(context.body, router.descriptor)) {
-        throw new HttpError("요청 정보가 올바르지 않습니다.", "BAD_REQUEST");
+      if (router.descriptor) {
+        const result = validate(context.body, router.descriptor);
+        if (!result.valid) {
+          const error = result.errors[0];
+          throw new HttpError(
+            `요청 정보가 올바르지 않습니다. (reason: ${error.reason}, from: ${error.property})`,
+            "BAD_REQUEST",
+          );
+        }
       }
 
       if (router.authorized) {

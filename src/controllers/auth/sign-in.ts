@@ -1,15 +1,17 @@
 import { createRouter } from "router";
-import * as users from "@/services/users";
-import * as jwt from "@/services/jwt";
 import { HttpError } from "@/utilities/error";
+import { nullable } from "@/guards/type-guard";
+
+import * as users from "services/users";
+import * as jwt from "services/jwt";
 
 export default createRouter({
   method: "POST",
   descriptor: {
-    username: "string nullable",
-    avatarUrl: "string nullable",
-    provider: "string nullable",
-    providerId: "string nullable",
+    username: nullable("string"),
+    avatarUrl: nullable("string"),
+    provider: nullable("string"),
+    providerId: nullable("string"),
   },
   async handler(ctx) {
     const input = ctx.body;

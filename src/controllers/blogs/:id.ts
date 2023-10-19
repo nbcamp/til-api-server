@@ -1,4 +1,6 @@
 import { createRouter } from "router";
+import { optional } from "@/guards/type-guard";
+
 import * as blogs from "services/blogs";
 
 export default createRouter({
@@ -15,8 +17,8 @@ export const UPDATE = createRouter({
   method: "PATCH",
   authorized: true,
   descriptor: {
-    name: "string optional",
-    primary: "boolean optional",
+    name: optional("string"),
+    primary: optional("boolean"),
   },
   async handler(ctx) {
     const result = await blogs.update(+ctx.param.id, {

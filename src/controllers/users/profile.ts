@@ -1,4 +1,6 @@
 import { createRouter } from "router";
+import { nullable, optional } from "@/guards/type-guard";
+
 import * as users from "services/users";
 
 export default createRouter({
@@ -17,8 +19,8 @@ export const UPDATE = createRouter({
   method: "PATCH",
   authorized: true,
   descriptor: {
-    username: "string nullable optional",
-    avatarUrl: "string nullable optional",
+    username: optional(nullable("string")),
+    avatarUrl: optional(nullable("string")),
   },
   async handler(ctx) {
     const result = await users.update(ctx.auth.user.id, ctx.body);
