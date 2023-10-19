@@ -4,54 +4,69 @@ import path from "node:path";
 import { InferType, TypeDescriptor, validate } from "@/guards/type-guard";
 import { HttpError } from "@/utilities/error";
 import { User } from "@prisma/client";
+
 import * as jwt from "services/jwt";
 import * as users from "services/users";
 
-type Body = { [key: string]: any };
+interface Body {
+  [key: string]: any;
+}
 
-type Context<TBody extends Body = Body> = {
+interface Context<TBody extends Body> {
   param: { [key: string]: string };
   query: { [key: string]: string };
   body: TBody;
   request: Request;
-};
+}
 
-type AuthContext<TBody extends Body> = Context<TBody> & {
+interface AuthContext<TBody extends Body> extends Context<TBody> {
   auth: {
     token: string;
     user: User;
   };
-};
+}
 
-type Result = Record<string, any>;
+interface Result {
+  [key: string]: any;
+}
 
-type Handler<TContext extends Context = Context> = (
-  context: TContext,
-) => Result | Promise<Result>;
+interface Handler<TContext extends Context<Body>> {
+  (context: TContext): Result | Promise<Result>;
+}
 
-type Router<
+type AnyHandler = Handler<Context<any>>;
+
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+type Router<Descriptor extends TypeDescriptor> =
+  | OpenRouter<Descriptor>
+  | AuthRouter<Descriptor>;
+
+interface AuthRouter<
   Descriptor extends TypeDescriptor,
   TBody extends Body = InferType<Descriptor>,
-> = {
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+> {
+  method?: HttpMethod;
   descriptor?: Descriptor;
-  authorized?: boolean;
-} & (
-  | {
-      authorized: true;
-      handler: Handler<AuthContext<TBody>>;
-    }
-  | {
-      authorized?: false;
-      handler: Handler<Context<TBody>>;
-    }
-);
+  authorized: true;
+  handler: Handler<AuthContext<TBody>>;
+}
 
-type AnyRouter = {
+interface OpenRouter<
+  Descriptor extends TypeDescriptor,
+  TBody extends Body = InferType<Descriptor>,
+> {
+  method?: HttpMethod;
+  descriptor?: Descriptor;
+  authorized?: false;
+  handler: Handler<Context<TBody>>;
+}
+
+interface AnyRouter {
   route: string;
   method: string;
-  handler: Handler;
-};
+  handler: AnyHandler;
+}
 
 export function createRouter<Descriptor extends TypeDescriptor = never>(
   router: Router<Descriptor>,
@@ -89,11 +104,12 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
           );
         }
 
-        Reflect.set(context, "auth", {
+        (context as AuthContext<any>).auth = {
           token,
           user,
-        });
+        };
       }
+
       return router.handler(context as any);
     },
   };
