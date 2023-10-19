@@ -8,7 +8,20 @@ export default createRouter({
   async handler(ctx) {
     const blog = await blogs.findOneById(+ctx.param.id);
     return {
-      item: blog,
+      item: blog
+        ? {
+            id: blog.id,
+            name: blog.name,
+            url: blog.url,
+            rss: blog.rss,
+            primary: blog.primary,
+            keywords: blog.KeywordTagMaps.map(({ keyword, tags }) => ({
+              keyword,
+              tags: JSON.parse(tags),
+            })),
+            createdAt: blog.createdAt,
+          }
+        : null,
     };
   },
 });
@@ -19,6 +32,12 @@ export const UPDATE = createRouter({
   descriptor: {
     name: optional("string"),
     primary: optional("boolean"),
+    keywords: optional([
+      {
+        keyword: "string",
+        tags: ["string"],
+      },
+    ]),
   },
   async handler(ctx) {
     const result = await blogs.update(+ctx.param.id, {

@@ -12,6 +12,10 @@ export default createRouter({
         url: blog.url,
         rss: blog.rss,
         primary: blog.primary,
+        keywords: blog.KeywordTagMaps.map(({ keyword, tags }) => ({
+          keyword,
+          tags: JSON.parse(tags),
+        })),
         createdAt: blog.createdAt,
       })),
     };
@@ -25,12 +29,19 @@ export const CREATE = createRouter({
     name: "string",
     url: "string",
     rss: "string",
+    keywords: [
+      {
+        keyword: "string",
+        tags: ["string"],
+      },
+    ],
   },
   async handler(ctx) {
     const result = await blogs.create({
       ...ctx.body,
       userId: ctx.auth.user.id,
     });
+
     return {
       id: result.id,
     };
