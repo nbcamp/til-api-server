@@ -1,5 +1,5 @@
-import format from "date-fns/format";
 import { createRouter } from "router";
+import format from "date-fns/format";
 import pkg from "/package.json";
 
 const BUILD = format(new Date(), "yyyy-MM-dd HH:mm:ss");

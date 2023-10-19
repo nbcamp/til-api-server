@@ -1,9 +1,9 @@
 import glob from "fast-glob";
 import path from "node:path";
 
-import { InferType, TypeDescriptor, validate } from "@/guards/type-guard";
-import { HttpError } from "@/utilities/error";
 import { User } from "@prisma/client";
+import { HttpError, HttpMethod } from "@/utils/http";
+import { InferType, TypeDescriptor, validate } from "@/guards/type-guard";
 
 import * as jwt from "services/jwt";
 import * as users from "services/users";
@@ -35,8 +35,6 @@ interface Handler<TContext extends Context<Body>> {
 }
 
 type AnyHandler = Handler<Context<any>>;
-
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 type Router<Descriptor extends TypeDescriptor> =
   | OpenRouter<Descriptor>

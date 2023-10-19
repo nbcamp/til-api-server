@@ -1,4 +1,4 @@
-import { HttpError } from "@/utilities/error";
+import { HttpError } from "@/utils/http";
 import { prisma } from "prisma";
 
 export function findAllByUserId(userId: number) {

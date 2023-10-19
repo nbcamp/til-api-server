@@ -1,9 +1,8 @@
 import URLPattern from "url-pattern";
 
 import routers from "router";
-import { tryCatch } from "./utilities/tryCatch";
-import { response } from "./utilities/response";
-import { HttpError } from "./utilities/error";
+import { tryCatch } from "./utils/tryCatch";
+import { HttpError, response } from "./utils/http";
 
 const PORT = +(Bun.env.PORT || 3000);
 

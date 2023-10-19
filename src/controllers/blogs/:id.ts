@@ -1,6 +1,6 @@
 import { createRouter } from "router";
 import { optional } from "@/guards/type-guard";
-import { toUnixTime } from "@/utilities/unixtime";
+import { toUnixTime } from "@/utils/unixtime";
 
 import * as blogs from "services/blogs";
 

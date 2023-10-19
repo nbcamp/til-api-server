@@ -1,5 +1,5 @@
 import { createRouter } from "router";
-import { toUnixTime } from "@/utilities/unixtime";
+import { toUnixTime } from "@/utils/unixtime";
 
 import * as blogs from "services/blogs";
 

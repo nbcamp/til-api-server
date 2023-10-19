@@ -14,6 +14,22 @@ export const HttpStatusCode = {
 
 export type Status = keyof typeof HttpStatusCode;
 
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
+export class HttpError extends Error {
+  status!: Status;
+
+  get code() {
+    return HttpStatusCode[this.status];
+  }
+
+  constructor(message: string, status: Status, cause?: Error) {
+    super(message);
+    this.status = status;
+    this.cause = cause;
+  }
+}
+
 export function response(data: object, status: Status): Response {
   const code = HttpStatusCode[status];
 

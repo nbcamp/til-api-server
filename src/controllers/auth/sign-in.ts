@@ -1,5 +1,5 @@
 import { createRouter } from "router";
-import { HttpError } from "@/utilities/error";
+import { HttpError } from "@/utils/http";
 import { nullable } from "@/guards/type-guard";
 
 import * as users from "services/users";
