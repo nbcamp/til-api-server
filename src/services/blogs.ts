@@ -19,9 +19,9 @@ export function findPrimaryByUserId(userId: number) {
   return prisma.blog.findFirst({ where: { userId, primary: true } });
 }
 
-export function findOneById(id: number) {
+export function findOneById(input: { blogId: number; userId: number }) {
   return prisma.blog.findFirst({
-    where: { id },
+    where: { id: input.blogId, userId: input.userId },
     include: {
       KeywordTagMaps: {
         select: {
@@ -134,10 +134,10 @@ export async function update(
   });
 }
 
-export async function remove(id: number) {
-  const blog = await findOneById(id);
+export async function remove(input: { blogId: number; userId: number }) {
+  const blog = await findOneById(input);
   if (blog?.primary) {
     throw new HttpError("기본 블로그는 삭제할 수 없습니다.", "BAD_REQUEST");
   }
-  return prisma.blog.delete({ where: { id } });
+  return prisma.blog.delete({ where: { id: input.blogId } });
 }

@@ -67,7 +67,16 @@ CREATE TABLE "tags" (
 CREATE UNIQUE INDEX "providerIndex" ON "users"("provider", "provider_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "blogIdIndex" ON "blogs"("id", "user_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "userNameIndex" ON "blogs"("user_id", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "postBlogIdIndex" ON "posts"("id", "blog_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "postUserIdIndex" ON "posts"("id", "user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "postTagIndex" ON "post_tags"("post_id", "tag_id");

@@ -1,4 +1,6 @@
 import { createRouter } from "router";
+import { toUnixTime } from "@/utilities/unixtime";
+
 import * as blogs from "services/blogs";
 
 export default createRouter({
@@ -16,7 +18,7 @@ export default createRouter({
           keyword,
           tags: JSON.parse(tags),
         })),
-        createdAt: blog.createdAt,
+        createdAt: toUnixTime(blog.createdAt),
       })),
     };
   },

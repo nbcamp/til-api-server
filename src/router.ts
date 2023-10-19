@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { InferType, TypeDescriptor, validate } from "@/guards/type-guard";
 import { HttpError } from "@/utilities/error";
-import { User } from "./prisma/generated";
+import { User } from "@prisma/client";
 import * as jwt from "services/jwt";
 import * as users from "services/users";
 

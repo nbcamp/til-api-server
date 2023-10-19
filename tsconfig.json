@@ -16,12 +16,12 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "/*": ["./*"],
       "prisma": ["./src/prisma"],
       "router": ["./src/router.ts"],
       "controllers/*": ["./src/controllers/*"],
       "services/*": ["./src/services/*"],
       "@/*": ["./src/*"],
+      "/*": ["./*"],
     },
     "types": [
       "bun-types"

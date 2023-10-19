@@ -1,12 +1,16 @@
 import { createRouter } from "router";
 import { optional } from "@/guards/type-guard";
+import { toUnixTime } from "@/utilities/unixtime";
 
 import * as blogs from "services/blogs";
 
 export default createRouter({
   authorized: true,
   async handler(ctx) {
-    const blog = await blogs.findOneById(+ctx.param.id);
+    const blog = await blogs.findOneById({
+      blogId: +ctx.param.id,
+      userId: ctx.auth.user.id,
+    });
     return {
       item: blog
         ? {
@@ -19,7 +23,7 @@ export default createRouter({
               keyword,
               tags: JSON.parse(tags),
             })),
-            createdAt: blog.createdAt,
+            createdAt: toUnixTime(blog.createdAt),
           }
         : null,
     };
@@ -55,7 +59,10 @@ export const DELETE = createRouter({
   method: "DELETE",
   authorized: true,
   async handler(ctx) {
-    await blogs.remove(+ctx.param.id);
+    await blogs.remove({
+      blogId: +ctx.param.id,
+      userId: ctx.auth.user.id,
+    });
     return {
       ok: true,
     };

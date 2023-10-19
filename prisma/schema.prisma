@@ -41,6 +41,7 @@ model Blog {
   createdAt      DateTime        @default(now()) @map("created_at")
   updatedAt      DateTime        @updatedAt @map("updated_at")
 
+  @@unique([id, userId], map: "blogIdIndex")
   @@unique([userId, name], map: "userNameIndex")
   @@map("blogs")
 }
@@ -59,6 +60,8 @@ model Post {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
+  @@unique([id, blogId], map: "postBlogIdIndex")
+  @@unique([id, userId], map: "postUserIdIndex")
   @@map("posts")
 }
 

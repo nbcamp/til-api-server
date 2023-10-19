@@ -17,7 +17,7 @@
     "eslint:recommended"
   ],
   "plugins": ["import", "@typescript-eslint", "prettier"],
-  "ignorePatterns": ["node_modules/", "tsconfig.json", "generated"],
+  "ignorePatterns": ["node_modules/", "tsconfig.json"],
   "rules": {
     "prettier/prettier": "warn",
     "no-undef": "off",
