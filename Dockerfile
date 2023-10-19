@@ -7,17 +7,9 @@ run bash n $NODE_VERSION
 run rm n
 run npm install -g n
 
-# TODO: 환경 변수 설정
-env PORT 8080
-env NODE_ENV local
-env TZ Asia/Seoul
-env DATABASE_URL file:./dev.db
-env JWT_SECRET my-secret
-
 workdir /home/bun/app
 
-copy package.json bun.lockb .
-copy tsconfig.json .
+copy package.json bun.lockb tsconfig.json .env .
 copy prisma ./prisma
 copy src ./src
 
