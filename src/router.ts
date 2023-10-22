@@ -37,25 +37,25 @@ interface Handler<TContext extends Context<Body>> {
 type AnyHandler = Handler<Context<any>>;
 
 type Router<Descriptor extends TypeDescriptor> =
-  | OpenRouter<Descriptor>
-  | AuthRouter<Descriptor>;
+  | AuthRouter<Descriptor>
+  | OpenRouter<Descriptor>;
 
 interface AuthRouter<
-  Descriptor extends TypeDescriptor,
-  TBody extends Body = InferType<Descriptor>,
+  TDescriptor extends TypeDescriptor,
+  TBody extends Body = InferType<TDescriptor>,
 > {
   method?: HttpMethod;
-  descriptor?: Descriptor;
+  descriptor?: TDescriptor;
   authorized: true;
   handler: Handler<AuthContext<TBody>>;
 }
 
 interface OpenRouter<
-  Descriptor extends TypeDescriptor,
-  TBody extends Body = InferType<Descriptor>,
+  TDescriptor extends TypeDescriptor,
+  TBody extends Body = InferType<TDescriptor>,
 > {
   method?: HttpMethod;
-  descriptor?: Descriptor;
+  descriptor?: TDescriptor;
   authorized?: false;
   handler: Handler<Context<TBody>>;
 }
@@ -124,7 +124,7 @@ async function makeFileSystemBasedRouterMap(dir: string): Promise<AnyRouter[]> {
         path.resolve(controllers, filename)
       );
       if (!imported) {
-        throw new Error(`Router must be exported as default from ${filename}`);
+        throw new Error(`Router not found: ${filename}`);
       }
       return Object.values(imported).map((router) => ({
         route,
