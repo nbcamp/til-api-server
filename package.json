@@ -8,7 +8,8 @@
     "postinstall": "prisma generate",
     "migrate": "prisma migrate deploy",
     "migrate:dev": "prisma migrate dev",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "tsc": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^5.4.2",
