@@ -9,3 +9,4 @@ do
 done
 
 bun migrate
+bun start:prod

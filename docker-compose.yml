@@ -26,14 +26,8 @@ services:
       - mysql-data:/var/lib/mysql
     ports:
       - ${DB_PORT}:3306
-    networks:
-      - api-network
     expose:
       - ${DB_PORT}
 
 volumes:
   mysql-data:
-
-networks:
-  api-network:
-    driver: bridge

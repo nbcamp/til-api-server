@@ -28,6 +28,7 @@ jobs:
       - name: Create .env file with Secrets
         uses: SpicyPizza/create-envfile@v2.0
         with:
+          envkey_DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}
           envkey_DB_DATABASE: ${{ secrets.DB_DATABASE }}
           envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           envkey_DB_HOST: ${{ secrets.DB_HOST }}
@@ -47,15 +48,6 @@ jobs:
           push: true
           tags: ${{ secrets.DK_USERNAME }}/${{ secrets.DK_IMAGE }}:latest
 
-      - name: Send docker-compose.yml, .env to EC2
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          source: docker-compose.yml,.env
-          target: /home/ubuntu
-
       - name: Deploy Docker to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -64,10 +56,17 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script_stop: true
           script: |
-            mv .env /tmp
-            export $(cat /tmp/.env | xargs)
-            sudo docker compose pull
-            sudo docker compose up -d
-            sudo docker container prune -f
-            sudo docker image prune -f
-            rm -f docker-compose.yml /tmp/.env
+            sudo docker pull mysql:8.1.0
+            sudo docker pull ${{ secrets.DK_USERNAME }}/${{ secrets.DK_IMAGE }}:latest
+            sudo docker rm -f ${{ secrets.DK_IMAGE }} || true
+            sudo docker rm -f ${{ secrets.DK_IMAGE }}-db || true
+            sudo docker network rm api-network || true
+            sudo docker network create api-network
+            sudo docker run --network api-network --name ${{ secrets.DK_IMAGE }}-db \
+                       -e MYSQL_DATABASE=${{ secrets.DB_DATABASE }} -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} -e TZ=${{ secrets.TZ }} \
+                       -v mysql-data:/var/lib/mysql -p ${{ secrets.DB_PORT }}:3306 -d mysql:8.1.0 --default-authentication-plugin=mysql_native_password
+            sudo docker run --network api-network --add-host host.docker.internal:host-gateway --name ${{ secrets.DK_IMAGE }} \
+                       --link ${{ secrets.DK_IMAGE }}-db:db -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
+                       -d ${{ secrets.DK_USERNAME }}/${{ secrets.DK_IMAGE }}:latest /home/bun/app/wait-for-db.sh
+            sudo docker container prune -f || true
+            sudo docker image prune -f || true
