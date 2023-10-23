@@ -1,5 +1,5 @@
 import { createRouter } from "router";
-import { nullable, optional } from "@/guards/type-guard";
+import { nullable, optional } from "@/utils/validator";
 
 import * as users from "services/users";
 

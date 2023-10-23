@@ -1,6 +1,6 @@
 import { createRouter } from "router";
 import { HttpError } from "@/utils/http";
-import { nullable } from "@/guards/type-guard";
+import { nullable } from "@/utils/validator";
 
 import * as users from "services/users";
 import * as jwt from "services/jwt";

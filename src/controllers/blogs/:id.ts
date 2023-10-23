@@ -1,5 +1,5 @@
 import { createRouter } from "router";
-import { optional } from "@/guards/type-guard";
+import { optional } from "@/utils/validator";
 import { toUnixTime } from "@/utils/unixtime";
 
 import * as blogs from "services/blogs";
