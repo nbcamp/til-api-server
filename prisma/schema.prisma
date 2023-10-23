@@ -17,29 +17,46 @@ model User {
   avatarUrl    String?   @map("avatar_url")
   provider     String?
   providerId   String?   @map("provider_id")
-  Blogs        Blog[]
-  Posts        Post[]
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
   lastSignedAt DateTime? @map("last_signed_at")
   deletedAt    DateTime? @map("deleted_at")
 
+  blogs      Blog[]
+  posts      Post[]
+  followers  Follow[] @relation("follower")
+  followings Follow[] @relation("following")
+
   @@unique([provider, providerId], map: "providerIndex")
   @@map("users")
 }
 
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int      @map("follower_id")
+  followingId Int      @map("following_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId], map: "followerFollowingIndex")
+  @@map("follows")
+}
+
 model Blog {
-  id             Int             @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  name      String
+  url       String
+  rss       String
+  primary   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         Int             @map("user_id")
-  name           String
-  url            String
-  rss            String
-  primary        Boolean         @default(false)
-  Posts          Post[]
-  KeywordTagMaps KeywordTagMap[]
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at")
+  posts          Post[]
+  keywordTagMaps KeywordTagMap[]
 
   @@unique([id, userId], map: "blogIdIndex")
   @@unique([userId, name], map: "userNameIndex")
@@ -47,18 +64,19 @@ model Blog {
 }
 
 model Post {
-  id          Int       @id @default(autoincrement())
-  blog        Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
-  blogId      Int       @map("blog_id")
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int       @map("user_id")
+  id          Int      @id @default(autoincrement())
+  blogId      Int      @map("blog_id")
+  userId      Int      @map("user_id")
   title       String
   description String
   url         String
-  PostTags    PostTag[]
   publishedAt DateTime
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  blog     Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id])
+  postTags PostTag[]
 
   @@unique([id, blogId], map: "postBlogIdIndex")
   @@unique([id, userId], map: "postUserIdIndex")
@@ -66,11 +84,12 @@ model Post {
 }
 
 model PostTag {
-  id     Int  @id @default(autoincrement())
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId Int  @map("post_id")
-  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  tagId  Int  @map("tag_id")
+  id     Int @id @default(autoincrement())
+  postId Int @map("post_id")
+  tagId  Int @map("tag_id")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@unique([postId, tagId], map: "postTagIndex")
   @@map("post_tags")
@@ -78,19 +97,21 @@ model PostTag {
 
 model KeywordTagMap {
   id      Int    @id @default(autoincrement())
-  blog    Blog   @relation(fields: [blogId], references: [id], onDelete: Cascade)
   blogId  Int    @map("blog_id")
   keyword String
   tags    String
+
+  blog Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
 
   @@unique([blogId, keyword], map: "blogKeywordIndex")
   @@map("keyword_tag_maps")
 }
 
 model Tag {
-  id       Int       @id @default(autoincrement())
-  name     String
-  PostTags PostTag[]
+  id   Int    @id @default(autoincrement())
+  name String
+
+  postTags PostTag[]
 
   @@map("tags")
 }

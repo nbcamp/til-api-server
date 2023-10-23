@@ -14,7 +14,7 @@ export default createRouter({
         url: blog.url,
         rss: blog.rss,
         primary: blog.primary,
-        keywords: blog.KeywordTagMaps.map(({ keyword, tags }) => ({
+        keywords: blog.keywordTagMaps.map(({ keyword, tags }) => ({
           keyword,
           tags: JSON.parse(tags),
         })),

@@ -5,7 +5,7 @@ export function findAllByUserId(userId: number) {
   return prisma.blog.findMany({
     where: { userId },
     include: {
-      KeywordTagMaps: {
+      keywordTagMaps: {
         select: {
           keyword: true,
           tags: true,
@@ -23,7 +23,7 @@ export function findOneById(input: { blogId: number; userId: number }) {
   return prisma.blog.findFirst({
     where: { id: input.blogId, userId: input.userId },
     include: {
-      KeywordTagMaps: {
+      keywordTagMaps: {
         select: {
           keyword: true,
           tags: true,
