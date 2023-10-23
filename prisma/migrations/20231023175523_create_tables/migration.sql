@@ -10,7 +10,7 @@ CREATE TABLE `users` (
     `last_signed_at` TIMESTAMP NULL,
     `deleted_at` TIMESTAMP NULL,
 
-    UNIQUE INDEX `providerIndex`(`provider`, `provider_id`),
+    UNIQUE INDEX `users_provider_provider_id_key`(`provider`, `provider_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -21,7 +21,7 @@ CREATE TABLE `follows` (
     `following_id` INTEGER NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
 
-    UNIQUE INDEX `followerFollowingIndex`(`follower_id`, `following_id`),
+    UNIQUE INDEX `follows_follower_id_following_id_key`(`follower_id`, `following_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -36,8 +36,8 @@ CREATE TABLE `blogs` (
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     `updated_at` TIMESTAMP NOT NULL,
 
-    UNIQUE INDEX `blogIdIndex`(`id`, `user_id`),
-    UNIQUE INDEX `userNameIndex`(`user_id`, `name`),
+    UNIQUE INDEX `blogs_id_user_id_key`(`id`, `user_id`),
+    UNIQUE INDEX `blogs_user_id_name_key`(`user_id`, `name`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -47,14 +47,14 @@ CREATE TABLE `posts` (
     `blog_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
     `title` VARCHAR(50) NOT NULL,
-    `description` TEXT NOT NULL,
+    `content` TEXT NOT NULL,
     `url` TEXT NOT NULL,
     `publishedAt` TIMESTAMP NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     `updated_at` TIMESTAMP NOT NULL,
 
-    UNIQUE INDEX `postBlogIdIndex`(`id`, `blog_id`),
-    UNIQUE INDEX `postUserIdIndex`(`id`, `user_id`),
+    UNIQUE INDEX `posts_id_blog_id_key`(`id`, `blog_id`),
+    UNIQUE INDEX `posts_id_user_id_key`(`id`, `user_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -64,7 +64,7 @@ CREATE TABLE `post_tags` (
     `post_id` INTEGER NOT NULL,
     `tag` VARCHAR(20) NOT NULL,
 
-    UNIQUE INDEX `postTagIndex`(`post_id`, `tag`),
+    UNIQUE INDEX `post_tags_post_id_tag_key`(`post_id`, `tag`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -75,7 +75,7 @@ CREATE TABLE `keyword_tag_maps` (
     `keyword` VARCHAR(20) NOT NULL,
     `tags` JSON NOT NULL,
 
-    UNIQUE INDEX `blogKeywordIndex`(`blog_id`, `keyword`),
+    UNIQUE INDEX `keyword_tag_maps_blog_id_keyword_key`(`blog_id`, `keyword`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

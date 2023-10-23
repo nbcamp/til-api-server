@@ -9,7 +9,7 @@ export async function findById(id: number) {
 export async function findByProvider(provider: string, providerId: string) {
   return prisma.user.findUnique({
     where: {
-      provider_providerId: {
+      providerIndex: {
         provider,
         providerId,
       },
@@ -40,14 +40,14 @@ export function update(
 }
 
 export async function remove(id: number) {
-  await prisma.$transaction(async (tx) => {
-    await tx.blog.deleteMany({ where: { userId: id } });
-    return tx.user.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
+  return prisma.user.update({
+    where: { id },
+    data: {
+      deletedAt: new Date(),
+      blogs: {
+        deleteMany: {},
       },
-    });
+    },
   });
 }
 

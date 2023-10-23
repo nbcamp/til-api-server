@@ -1,4 +1,4 @@
-import { HttpError } from "@/utils/http";
+import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 
 export function findAllByUserId(userId: number) {
@@ -62,20 +62,17 @@ export async function create(input: {
         rss: input.rss,
         primary: count === 0,
         userId: input.userId,
-      },
-    });
-
-    await Promise.all(
-      input.keywords.map(({ keyword, tags }) =>
-        tx.keywordTagMap.create({
-          data: {
-            keyword,
-            blogId: blog.id,
-            tags,
+        keywordTagMaps: {
+          createMany: {
+            data: input.keywords.map(({ keyword, tags }) => ({
+              keyword,
+              tags,
+            })),
           },
-        }),
-      ),
-    );
+        },
+      },
+      include: { keywordTagMaps: true },
+    });
 
     return blog;
   });
@@ -115,22 +112,21 @@ export async function update(
       }
     }
 
-    if (input.keywords && input.keywords.length > 0) {
+    if (input.keywords?.length) {
       await tx.keywordTagMap.deleteMany({ where: { blogId: id } });
-      await Promise.all(
-        input.keywords.map(({ keyword, tags }) =>
-          tx.keywordTagMap.create({
-            data: {
-              keyword,
-              blogId: id,
-              tags,
-            },
-          }),
-        ),
-      );
+      await tx.keywordTagMap.createMany({
+        data: input.keywords.map((map) => ({
+          ...map,
+          blogId: id,
+        })),
+      });
     }
 
-    return tx.blog.update({ where: { id }, data: input });
+    return tx.blog.update({
+      where: { id },
+      data: input,
+      include: { keywordTagMaps: true },
+    });
   });
 }
 

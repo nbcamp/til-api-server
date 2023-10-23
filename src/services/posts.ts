@@ -1,4 +1,4 @@
-import { HttpError } from "@/utils/http";
+import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 
 export function findAllByUserId(userId: number) {
@@ -13,7 +13,10 @@ export function findOneById(input: { postId: number; userId: number }) {
 
 export async function update(
   id: number,
-  input: { url?: string; tags?: string[] },
+  input: {
+    url?: string;
+    tags?: string[];
+  },
 ) {
   const post = await prisma.post.findUnique({
     where: { id },
@@ -21,7 +24,7 @@ export async function update(
   });
 
   if (!post) {
-    throw new HttpError("해당 TIL을 찾을 수 없습니다.", "BAD_REQUEST");
+    throw new HttpError("Not found", "NOT_FOUND");
   }
 
   if (await prisma.post.findFirst({ where: { url: input.url } })) {

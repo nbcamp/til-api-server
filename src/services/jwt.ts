@@ -8,11 +8,9 @@ export function sign(payload: object) {
   });
 }
 
-export function verify(token: string): object | null {
-  try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    return typeof payload === "object" ? payload : null;
-  } catch (error) {
-    return null;
-  }
+export function verify<Payload extends Record<string, any>>(
+  token: string,
+): Payload {
+  const payload = jwt.verify(token, JWT_SECRET);
+  return payload as Payload;
 }

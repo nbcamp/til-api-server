@@ -1,26 +1,28 @@
 import { createRouter } from "router";
-import { optional } from "@/utils/validator";
-import { toUnixTime } from "@/utils/unixtime";
+import { HttpError } from "utils/http";
+import { optional } from "utils/validator";
+import { toUnixTime } from "utils/unixtime";
 
 import * as posts from "services/posts";
 
+import { Post } from "models/Post";
+
 export default createRouter({
   authorized: true,
-  async handler(ctx) {
+  async handler(ctx): Promise<Post> {
     const post = await posts.findOneById({
       postId: +ctx.param.id,
       userId: ctx.auth.user.id,
     });
+    if (!post) {
+      throw new HttpError("Not found", "NOT_FOUND");
+    }
     return {
-      item: post
-        ? {
-            id: post.id,
-            title: post.title,
-            description: post.description,
-            url: post.url,
-            publishedAt: toUnixTime(post.publishedAt),
-          }
-        : null,
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      url: post.url,
+      publishedAt: toUnixTime(post.publishedAt),
     };
   },
 });
@@ -32,13 +34,17 @@ export const UPDATE = createRouter({
     url: optional("string"),
     tags: optional(["string"]),
   },
-  async handler(ctx) {
-    const result = await posts.update(+ctx.param.id, {
+  async handler(ctx): Promise<Post> {
+    const post = await posts.update(+ctx.param.id, {
       url: ctx.body.url,
       tags: ctx.body.tags,
     });
     return {
-      id: result.id,
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      url: post.url,
+      publishedAt: toUnixTime(post.publishedAt),
     };
   },
 });

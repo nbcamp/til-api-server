@@ -27,7 +27,7 @@ model User {
   followers  Follow[] @relation("follower")
   followings Follow[] @relation("following")
 
-  @@unique([provider, providerId], map: "providerIndex")
+  @@unique([provider, providerId], name: "providerIndex")
   @@map("users")
 }
 
@@ -40,7 +40,7 @@ model Follow {
   follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
 
-  @@unique([followerId, followingId], map: "followerFollowingIndex")
+  @@unique([followerId, followingId], name: "followerFollowingIndex")
   @@map("follows")
 }
 
@@ -58,8 +58,8 @@ model Blog {
   posts          Post[]
   keywordTagMaps KeywordTagMap[]
 
-  @@unique([id, userId], map: "blogIdIndex")
-  @@unique([userId, name], map: "userNameIndex")
+  @@unique([id, userId], name: "blogIdIndex")
+  @@unique([userId, name], name: "userNameIndex")
   @@map("blogs")
 }
 
@@ -68,7 +68,7 @@ model Post {
   blogId      Int      @map("blog_id")
   userId      Int      @map("user_id")
   title       String   @db.VarChar(50)
-  description String   @db.Text()
+  content     String   @db.Text()
   url         String   @db.Text()
   publishedAt DateTime @db.Timestamp()
   createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
@@ -78,8 +78,8 @@ model Post {
   user     User      @relation(fields: [userId], references: [id])
   postTags PostTag[]
 
-  @@unique([id, blogId], map: "postBlogIdIndex")
-  @@unique([id, userId], map: "postUserIdIndex")
+  @@unique([id, blogId], name: "postBlogIdIndex")
+  @@unique([id, userId], name: "postUserIdIndex")
   @@map("posts")
 }
 
@@ -90,7 +90,7 @@ model PostTag {
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  @@unique([postId, tag], map: "postTagIndex")
+  @@unique([postId, tag], name: "postTagIndex")
   @@map("post_tags")
 }
 
@@ -102,7 +102,7 @@ model KeywordTagMap {
 
   blog Blog @relation(fields: [blogId], references: [id], onDelete: Cascade)
 
-  @@unique([blogId, keyword], map: "blogKeywordIndex")
+  @@unique([blogId, keyword], name: "blogKeywordIndex")
   @@map("keyword_tag_maps")
 }
 

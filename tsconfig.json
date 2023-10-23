@@ -20,6 +20,8 @@
       "router": ["./src/router.ts"],
       "controllers/*": ["./src/controllers/*"],
       "services/*": ["./src/services/*"],
+      "models/*": ["./src/models/*"], 
+      "utils/*": ["./src/utils/*"],
       "@/*": ["./src/*"],
       "/*": ["./*"],
     },

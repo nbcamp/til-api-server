@@ -1,23 +1,23 @@
 import { createRouter } from "router";
-import { toUnixTime } from "@/utils/unixtime";
+import { toUnixTime } from "utils/unixtime";
 
 import * as blogs from "services/blogs";
 
+import { Blog } from "models/Blog";
+
 export default createRouter({
   authorized: true,
-  async handler(ctx) {
+  async handler(ctx): Promise<Blog[]> {
     const list = await blogs.findAllByUserId(ctx.auth.user.id);
-    return {
-      items: list.map((blog) => ({
-        id: blog.id,
-        name: blog.name,
-        url: blog.url,
-        rss: blog.rss,
-        primary: blog.primary,
-        keywords: blog.keywordTagMaps,
-        createdAt: toUnixTime(blog.createdAt),
-      })),
-    };
+    return list.map((blog) => ({
+      id: blog.id,
+      name: blog.name,
+      url: blog.url,
+      rss: blog.rss,
+      primary: blog.primary,
+      keywords: blog.keywordTagMaps as Blog["keywords"],
+      createdAt: toUnixTime(blog.createdAt),
+    }));
   },
 });
 
@@ -35,14 +35,20 @@ export const CREATE = createRouter({
       },
     ],
   },
-  async handler(ctx) {
-    const result = await blogs.create({
+  async handler(ctx): Promise<Blog> {
+    const blog = await blogs.create({
       ...ctx.body,
       userId: ctx.auth.user.id,
     });
 
     return {
-      id: result.id,
+      id: blog.id,
+      name: blog.name,
+      url: blog.url,
+      rss: blog.rss,
+      primary: blog.primary,
+      keywords: blog.keywordTagMaps as Blog["keywords"],
+      createdAt: toUnixTime(blog.createdAt),
     };
   },
 });

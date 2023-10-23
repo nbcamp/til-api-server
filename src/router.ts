@@ -90,22 +90,23 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
         if (tokenType !== "Bearer" || !token) {
           throw new HttpError("로그인이 필요합니다.", "UNAUTHORIZED");
         }
-        const payload = jwt.verify(token);
-        if (!payload || !("id" in payload) || typeof payload.id !== "number") {
-          throw new HttpError("인증 정보가 올바르지 않습니다.", "UNAUTHORIZED");
-        }
-        const user = await users.findById(payload.id);
-        if (!user) {
+        try {
+          const payload = jwt.verify<{ id: number }>(token);
+          const user = await users.findById(payload.id);
+          if (!user) {
+            throw new HttpError(
+              "사용자 정보를 찾을 수 없습니다.",
+              "UNAUTHORIZED",
+            );
+          }
+          (context as AuthContext<any>).auth = { token, user };
+        } catch (error) {
           throw new HttpError(
-            "사용자 정보를 찾을 수 없습니다.",
+            "인증 정보가 올바르지 않습니다.",
             "UNAUTHORIZED",
+            error as Error,
           );
         }
-
-        (context as AuthContext<any>).auth = {
-          token,
-          user,
-        };
       }
 
       return router.handler(context as any);
