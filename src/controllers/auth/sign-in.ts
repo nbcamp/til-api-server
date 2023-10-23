@@ -10,8 +10,8 @@ export default createRouter({
   descriptor: {
     username: nullable("string"),
     avatarUrl: nullable("string"),
-    provider: nullable("string"),
-    providerId: nullable("string"),
+    provider: "string",
+    providerId: "string",
   },
   async handler(ctx) {
     const input = ctx.body;

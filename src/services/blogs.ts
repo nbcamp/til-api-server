@@ -71,7 +71,7 @@ export async function create(input: {
           data: {
             keyword,
             blogId: blog.id,
-            tags: JSON.stringify(tags),
+            tags,
           },
         }),
       ),
@@ -123,7 +123,7 @@ export async function update(
             data: {
               keyword,
               blogId: id,
-              tags: JSON.stringify(tags),
+              tags,
             },
           }),
         ),

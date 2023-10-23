@@ -84,14 +84,13 @@ model Post {
 }
 
 model PostTag {
-  id     Int @id @default(autoincrement())
-  postId Int @map("post_id")
-  tagId  Int @map("tag_id")
+  id     Int    @id @default(autoincrement())
+  postId Int    @map("post_id")
+  tag    String @db.VarChar(20)
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
-  @@unique([postId, tagId], map: "postTagIndex")
+  @@unique([postId, tag], map: "postTagIndex")
   @@map("post_tags")
 }
 
@@ -107,11 +106,11 @@ model KeywordTagMap {
   @@map("keyword_tag_maps")
 }
 
-model Tag {
-  id   Int    @id @default(autoincrement())
-  name String
+// model Tag {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-  postTags PostTag[]
+//   postTags PostTag[]
 
-  @@map("tags")
-}
+//   @@map("tags")
+// }

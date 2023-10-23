@@ -9,6 +9,7 @@ const TZ = Bun.env.TZ;
 export default createRouter({
   handler() {
     return {
+      message: "pong",
       version: pkg.version,
       build: BUILD,
       env: ENV,
