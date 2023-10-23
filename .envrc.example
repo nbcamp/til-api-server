@@ -1,7 +1,21 @@
-export PORT="3000"
-export NODE_ENV="local"
-export TZ="Asia/Seoul"
+PORT=8080
+NODE_ENV=local
+TZ=Asia/Seoul
 
-# https://www.prisma.io/docs/reference/database-reference/connection-urls#examples
-export DATABASE_URL=""
-export JWT_SECRET=""
+JWT_SECRET=
+
+# DOCKER
+DK_USERNAME=
+DK_IMAGE=
+
+# DATABASE
+DB_ROOT_PASSWORD=
+DB_DATABASE=
+DB_HOST=127.0.0.1 # host.docker.internal
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+
+
+# https://www.prisma.io/docs/concepts/database-connectors/mysql
+DATABASE_URL="mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
