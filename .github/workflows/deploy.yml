@@ -22,52 +22,52 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          username: ${{ secrets.DK_USERNAME }}
+          password: ${{ secrets.DK_TOKEN }}
 
-      - name: Create .env file
-        run: |
-          cat <<- EOF > .env
-          TZ=${{ secrets.TZ }}
-          PORT=${{ secrets.PORT }}
-          NODE_ENV=${{ secrets.NODE_ENV }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          EOF
+      - name: Create .env file with Secrets
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          envkey_DB_HOST: ${{ secrets.DB_HOST }}
+          envkey_DB_PORT: ${{ secrets.DB_PORT }}
+          envkey_DB_USER: ${{ secrets.DB_USER }}
+          envkey_DK_IMAGE: ${{ secrets.DK_IMAGE }}
+          envkey_DK_USERNAME: ${{ secrets.DK_USERNAME }}
+          envkey_NODE_ENV: ${{ secrets.NODE_ENV }}
+          envkey_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          envkey_PORT: ${{ secrets.PORT }}
+          envkey_TZ: ${{ secrets.TZ }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
+          tags: ${{ secrets.DK_USERNAME }}/${{ secrets.DK_IMAGE }}:latest
 
-      - name: Deploy Docker to EC2
-        uses: appleboy/ssh-action@v1.0.0
-        env:
-          DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE }}:latest
-          DOCKER_CONTAINER: ${{ secrets.DOCKER_IMAGE }}
-          PORT: ${{ secrets.PORT }}
+      - name: Send docker-compose.yml, .env to EC2
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          envs: DOCKER_IMAGE,DOCKER_CONTAINER,PORT
+          source: docker-compose.yml,.env
+          target: /home/ubuntu
+
+      - name: Deploy Docker to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script_stop: true
           script: |
-            cat <<- EOF > docker-compose.yml
-            version: "3.8"
-
-            services:
-              api:
-                image: $DOCKER_IMAGE
-                container_name: $DOCKER_CONTAINER
-                restart: always
-                ports:
-                  - $PORT:$PORT
-            EOF
-
+            mv .env /tmp
+            export $(cat /tmp/.env | xargs)
             sudo docker compose pull
             sudo docker compose up -d
             sudo docker container prune -f
             sudo docker image prune -f
-            rm -f docker-compose.yml
+            rm -f docker-compose.yml /tmp/.env

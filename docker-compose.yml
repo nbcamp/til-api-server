@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  api:
+    image: ${DK_USERNAME}/${DK_IMAGE}:latest
+    container_name: ${DK_IMAGE}
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    networks:
+      - api-network
+    command: ["/home/bun/app/wait-for-db.sh"]
+
+  db:
+    image: mysql:8.1.0
+    container_name: ${DK_IMAGE}-db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: ${TZ}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - ${DB_PORT}:3306
+    networks:
+      - api-network
+    expose:
+      - ${DB_PORT}
+
+volumes:
+  mysql-data:
+
+networks:
+  api-network:
+    driver: bridge
