@@ -1,18 +1,16 @@
 import handler from "router";
+import logger from "utils/logger";
 
+const API_URL = Bun.env.API_URL || "http://localhost";
 const PORT = +(Bun.env.PORT || 3000);
-
-function logger(request: Request) {
-  console.log(`[${request.method}] ${request.url}`);
-}
 
 Bun.serve({
   port: PORT,
   development: true,
   async fetch(request) {
-    logger(request);
+    logger.info(`${request.url}`, { request });
     return handler(request);
   },
 });
 
-console.log(`Listening on http://localhost:${PORT}`);
+logger.info(`Server is running on ${API_URL}:${PORT}`);

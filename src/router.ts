@@ -2,6 +2,7 @@ import glob from "fast-glob";
 import { pathToRegexp, Key } from "path-to-regexp";
 import path from "node:path";
 
+import logger from "utils/logger";
 import { User } from "@prisma/client";
 import { tryCatch } from "utils/tryCatch";
 import { HttpError, HttpMethod, response } from "utils/http";
@@ -197,10 +198,13 @@ export default async (request: Request): Promise<Response> => {
       });
       return response(result, "OK");
     } catch (error) {
-      console.error(error);
       if (error instanceof HttpError) {
+        logger.error(`${error.message} (${error.code}, ${error.status})`, {
+          error: error.cause ?? error,
+        });
         return response({ error: error.message }, error.status);
       }
+      logger.error("Internal Server Error", { error });
       return response(
         { error: "Internal Server Error" },
         "INTERNAL_SERVER_ERROR",
