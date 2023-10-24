@@ -8,5 +8,5 @@ do
   sleep 2
 done
 
-bun migrate
+bun migrate:prod
 bun start:prod

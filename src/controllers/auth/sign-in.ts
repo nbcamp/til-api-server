@@ -23,8 +23,8 @@ export default createRouter({
 
     const user = await users
       .findByProvider(input.provider, input.providerId)
-      .then((node) => node ?? users.create(input))
-      .then((node) => users.sync(node.id));
+      .then((user) => user ?? users.create(input))
+      .then((user) => users.sync(user.id));
 
     return {
       accessToken: jwt.sign({ id: user.id }),

@@ -14,7 +14,7 @@ export default createRouter({
       name: blog.name,
       url: blog.url,
       rss: blog.rss,
-      primary: blog.primary,
+      main: blog.main,
       keywords: blog.keywordTagMaps as Blog["keywords"],
       createdAt: toUnixTime(blog.createdAt),
     }));
@@ -46,7 +46,7 @@ export const CREATE = createRouter({
       name: blog.name,
       url: blog.url,
       rss: blog.rss,
-      primary: blog.primary,
+      main: blog.main,
       keywords: blog.keywordTagMaps as Blog["keywords"],
       createdAt: toUnixTime(blog.createdAt),
     };

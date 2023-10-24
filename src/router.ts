@@ -56,7 +56,7 @@ interface MetaRouter<TDescriptor extends TypeDescriptor> {
   method?: HttpMethod;
   descriptor?: TDescriptor;
   priority?: number;
-  route?: string | RegExp;
+  route?: string;
 }
 
 interface AuthRouter<
@@ -102,7 +102,7 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
         try {
           const payload = jwt.verify<{ id: number }>(token);
           const user = await users.findById(payload.id);
-          if (!user) {
+          if (!user || user.deletedAt) {
             throw new HttpError(
               "사용자 정보를 찾을 수 없습니다.",
               "UNAUTHORIZED",

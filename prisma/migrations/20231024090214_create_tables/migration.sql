@@ -32,7 +32,7 @@ CREATE TABLE `blogs` (
     `name` VARCHAR(20) NOT NULL,
     `url` TEXT NOT NULL,
     `rss` TEXT NOT NULL,
-    `primary` BOOLEAN NOT NULL DEFAULT false,
+    `main` BOOLEAN NOT NULL DEFAULT false,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     `updated_at` TIMESTAMP NOT NULL,
 
@@ -46,13 +46,14 @@ CREATE TABLE `posts` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `blog_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
-    `title` VARCHAR(50) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
     `content` TEXT NOT NULL,
-    `url` TEXT NOT NULL,
+    `url` VARCHAR(512) NOT NULL,
     `publishedAt` TIMESTAMP NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     `updated_at` TIMESTAMP NOT NULL,
 
+    UNIQUE INDEX `posts_url_key`(`url`),
     UNIQUE INDEX `posts_id_blog_id_key`(`id`, `blog_id`),
     UNIQUE INDEX `posts_id_user_id_key`(`id`, `user_id`),
     PRIMARY KEY (`id`)

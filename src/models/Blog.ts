@@ -5,7 +5,7 @@ export class Blog {
   name!: string;
   url!: string;
   rss!: string;
-  primary!: boolean;
+  main!: boolean;
   keywords!: KeywordTags[];
   createdAt!: number;
 }

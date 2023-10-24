@@ -4,32 +4,21 @@ import { prisma } from "prisma";
 export function findAllByUserId(userId: number) {
   return prisma.blog.findMany({
     where: { userId },
-    include: {
-      keywordTagMaps: {
-        select: {
-          keyword: true,
-          tags: true,
-        },
-      },
-    },
+    include: { keywordTagMaps: true },
   });
 }
 
-export function findPrimaryByUserId(userId: number) {
-  return prisma.blog.findFirst({ where: { userId, primary: true } });
+export function findMainByUserId(userId: number) {
+  return prisma.blog.findFirst({
+    where: { userId, main: true },
+    include: { keywordTagMaps: true },
+  });
 }
 
 export function findOneById(input: { blogId: number; userId: number }) {
   return prisma.blog.findFirst({
     where: { id: input.blogId, userId: input.userId },
-    include: {
-      keywordTagMaps: {
-        select: {
-          keyword: true,
-          tags: true,
-        },
-      },
-    },
+    include: { keywordTagMaps: true },
   });
 }
 
@@ -53,28 +42,21 @@ export async function create(input: {
     );
   }
 
-  return prisma.$transaction(async (tx) => {
-    const count = await tx.blog.count({ where: { userId: input.userId } });
-    const blog = await tx.blog.create({
-      data: {
-        name: input.name,
-        url: input.url,
-        rss: input.rss,
-        primary: count === 0,
-        userId: input.userId,
-        keywordTagMaps: {
-          createMany: {
-            data: input.keywords.map(({ keyword, tags }) => ({
-              keyword,
-              tags,
-            })),
-          },
+  const count = await prisma.blog.count({ where: { userId: input.userId } });
+  return prisma.blog.create({
+    data: {
+      name: input.name,
+      url: input.url,
+      rss: input.rss,
+      main: count === 0,
+      userId: input.userId,
+      keywordTagMaps: {
+        createMany: {
+          data: input.keywords,
         },
       },
-      include: { keywordTagMaps: true },
-    });
-
-    return blog;
+    },
+    include: { keywordTagMaps: true },
   });
 }
 
@@ -82,7 +64,7 @@ export async function update(
   id: number,
   input: {
     name?: string;
-    primary?: boolean;
+    main?: boolean;
     userId: number;
     keywords?: {
       keyword: string;
@@ -101,38 +83,30 @@ export async function update(
       );
     }
   }
-  return prisma.$transaction(async (tx) => {
-    if (input.primary) {
-      const blog = await findPrimaryByUserId(input.userId);
-      if (blog) {
-        await tx.blog.update({
-          where: { id: blog.id },
-          data: { primary: false },
-        });
-      }
-    }
+  const blog = await findMainByUserId(input.userId);
+  if (!blog) {
+    throw new HttpError("등록한 블로그가 없습니다.", "NOT_FOUND");
+  }
 
-    if (input.keywords?.length) {
-      await tx.keywordTagMap.deleteMany({ where: { blogId: id } });
-      await tx.keywordTagMap.createMany({
-        data: input.keywords.map((map) => ({
-          ...map,
-          blogId: id,
-        })),
-      });
-    }
-
-    return tx.blog.update({
-      where: { id },
-      data: input,
-      include: { keywordTagMaps: true },
-    });
+  return prisma.blog.update({
+    where: { id },
+    data: {
+      name: input.name,
+      main: input.main,
+      ...(input.keywords?.length && {
+        keywordTagMaps: {
+          deleteMany: {},
+          createMany: { data: input.keywords },
+        },
+      }),
+    },
+    include: { keywordTagMaps: true },
   });
 }
 
 export async function remove(input: { blogId: number; userId: number }) {
   const blog = await findOneById(input);
-  if (blog?.primary) {
+  if (blog?.main) {
     throw new HttpError("기본 블로그는 삭제할 수 없습니다.", "BAD_REQUEST");
   }
   return prisma.blog.delete({ where: { id: input.blogId } });

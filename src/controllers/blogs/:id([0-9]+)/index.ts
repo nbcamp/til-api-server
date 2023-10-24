@@ -22,7 +22,7 @@ export default createRouter({
       name: blog.name,
       url: blog.url,
       rss: blog.rss,
-      primary: blog.primary,
+      main: blog.main,
       keywords: blog.keywordTagMaps as Blog["keywords"],
       createdAt: toUnixTime(blog.createdAt),
     };
@@ -34,7 +34,7 @@ export const UPDATE = createRouter({
   authorized: true,
   descriptor: {
     name: optional("string"),
-    primary: optional("boolean"),
+    main: optional("boolean"),
     keywords: optional([
       {
         keyword: "string",
@@ -45,7 +45,7 @@ export const UPDATE = createRouter({
   async handler(ctx): Promise<Blog> {
     const blog = await blogs.update(+ctx.param.id, {
       name: ctx.body.name,
-      primary: ctx.body.primary,
+      main: ctx.body.main,
       userId: ctx.auth.user.id,
     });
     return {
@@ -53,7 +53,7 @@ export const UPDATE = createRouter({
       name: blog.name,
       url: blog.url,
       rss: blog.rss,
-      primary: blog.primary,
+      main: blog.main,
       keywords: blog.keywordTagMaps as Blog["keywords"],
       createdAt: toUnixTime(blog.createdAt),
     };

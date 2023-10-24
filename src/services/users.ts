@@ -1,9 +1,7 @@
 import { prisma } from "prisma";
 
 export async function findById(id: number) {
-  return prisma.user.findUnique({
-    where: { id, deletedAt: null },
-  });
+  return prisma.user.findUnique({ where: { id } });
 }
 
 export async function findByProvider(provider: string, providerId: string) {
@@ -13,7 +11,6 @@ export async function findByProvider(provider: string, providerId: string) {
         provider,
         providerId,
       },
-      deletedAt: null,
     },
   });
 }
@@ -56,6 +53,7 @@ export function sync(id: number) {
     where: { id },
     data: {
       lastSignedAt: new Date(),
+      deletedAt: null,
     },
   });
 }
