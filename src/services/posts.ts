@@ -2,12 +2,16 @@ import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 
 export function findAllByUserId(userId: number) {
-  return prisma.post.findMany({ where: { userId } });
+  return prisma.post.findMany({
+    where: { userId },
+    include: { postTags: true },
+  });
 }
 
 export function findOneById(input: { postId: number; userId: number }) {
   return prisma.post.findFirst({
     where: { id: input.postId, userId: input.userId },
+    include: { postTags: true },
   });
 }
 
@@ -46,6 +50,9 @@ export async function update(
         deleteMany: {},
         create: input.tags?.map((tag) => ({ tag })),
       },
+    },
+    include: {
+      postTags: true,
     },
   });
 }

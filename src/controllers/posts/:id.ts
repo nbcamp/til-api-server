@@ -22,6 +22,7 @@ export default createRouter({
       title: post.title,
       content: post.content,
       url: post.url,
+      tags: post.postTags.map(({ tag }) => tag),
       publishedAt: toUnixTime(post.publishedAt),
     };
   },
@@ -44,6 +45,7 @@ export const UPDATE = createRouter({
       title: post.title,
       content: post.content,
       url: post.url,
+      tags: post.postTags.map(({ tag }) => tag),
       publishedAt: toUnixTime(post.publishedAt),
     };
   },
