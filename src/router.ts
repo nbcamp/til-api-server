@@ -1,9 +1,11 @@
 import glob from "fast-glob";
+import { pathToRegexp, Key } from "path-to-regexp";
 import path from "node:path";
 
 import { User } from "@prisma/client";
-import { HttpError, HttpMethod } from "@/utils/http";
-import { InferType, TypeDescriptor, validate } from "@/utils/validator";
+import { tryCatch } from "utils/tryCatch";
+import { HttpError, HttpMethod, response } from "utils/http";
+import { InferType, TypeDescriptor, validate } from "utils/validator";
 
 import * as jwt from "services/jwt";
 import * as users from "services/users";
@@ -12,9 +14,17 @@ interface Body {
   [key: string]: any;
 }
 
+interface Param {
+  [key: string]: string;
+}
+
+interface Query {
+  [key: string]: string;
+}
+
 interface Context<TBody extends Body> {
-  param: { [key: string]: string };
-  query: { [key: string]: string };
+  param: Param;
+  query: Query;
   body: TBody;
   request: Request;
 }
@@ -34,18 +44,25 @@ interface Handler<TContext extends Context<Body>> {
   (context: TContext): Result | Promise<Result>;
 }
 
-type AnyHandler = Handler<Context<any>>;
+type AnyHandler = Handler<Context<Body>>;
 
 type Router<Descriptor extends TypeDescriptor> =
   | AuthRouter<Descriptor>
   | OpenRouter<Descriptor>;
 
+type AnyRouter = Router<any>;
+
+interface MetaRouter<TDescriptor extends TypeDescriptor> {
+  method?: HttpMethod;
+  descriptor?: TDescriptor;
+  priority?: number;
+  route?: string | RegExp;
+}
+
 interface AuthRouter<
   TDescriptor extends TypeDescriptor,
   TBody extends Body = InferType<TDescriptor>,
-> {
-  method?: HttpMethod;
-  descriptor?: TDescriptor;
+> extends MetaRouter<TDescriptor> {
   authorized: true;
   handler: Handler<AuthContext<TBody>>;
 }
@@ -53,22 +70,14 @@ interface AuthRouter<
 interface OpenRouter<
   TDescriptor extends TypeDescriptor,
   TBody extends Body = InferType<TDescriptor>,
-> {
-  method?: HttpMethod;
-  descriptor?: TDescriptor;
+> extends MetaRouter<TDescriptor> {
   authorized?: false;
   handler: Handler<Context<TBody>>;
 }
 
-interface AnyRouter {
-  route: string;
-  method: string;
-  handler: AnyHandler;
-}
-
 export function createRouter<Descriptor extends TypeDescriptor = never>(
   router: Router<Descriptor>,
-): Router<Descriptor> {
+): AnyRouter {
   return {
     ...router,
     method: router.method ?? "GET",
@@ -109,33 +118,95 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
         }
       }
 
+      Object.freeze(context.body);
+      Object.freeze(context.param);
+      Object.freeze(context.query);
       return router.handler(context as any);
     },
   };
 }
 
-async function makeFileSystemBasedRouterMap(dir: string): Promise<AnyRouter[]> {
+interface NormalizedRouter {
+  method: HttpMethod;
+  path: string;
+  route: RegExp;
+  keys: string[];
+  priority: number;
+  handler: AnyHandler;
+}
+
+async function makeFileSystemBasedRouterMap(
+  dir: string,
+): Promise<NormalizedRouter[]> {
   const controllers = path.resolve(__dirname, dir);
   const filenames = await glob("**/*.ts", { cwd: controllers });
 
-  const routers: AnyRouter[][] = await Promise.all(
+  const routers: NormalizedRouter[] = await Promise.all(
     filenames.map(async (filename) => {
-      const route = `/${filename.replace(/(\/?index)?\.ts$/, "")}`;
+      const routePath = `/${filename.replace(/(\/?index)?\.ts$/, "")}`;
       const imported: { [route: string]: AnyRouter } = await import(
         path.resolve(controllers, filename)
       );
-      if (!imported) {
-        throw new Error(`Router not found: ${filename}`);
-      }
-      return Object.values(imported).map((router) => ({
-        route,
-        method: router.method ?? "GET",
-        handler: router.handler,
-      }));
-    }),
-  );
 
-  return routers.flat();
+      const routers = Object.values(imported).reduce(
+        (acc, obj) => acc.concat(obj),
+        [] as AnyRouter[],
+      );
+
+      return routers.map((router) => {
+        const keys: Key[] = [];
+        return {
+          ...router,
+          path: routePath,
+          method: router.method ?? "GET",
+          route: pathToRegexp(router.route || routePath, keys, {
+            strict: true,
+          }),
+          keys: keys.map((key) => `${key.name}`),
+          priority: router.priority ?? 1000,
+          handler: router.handler as AnyHandler,
+        } satisfies NormalizedRouter;
+      });
+    }),
+  ).then((routers) => routers.flat().sort((a, b) => a.priority - b.priority));
+
+  return routers;
 }
 
-export default await makeFileSystemBasedRouterMap("controllers");
+const routers = await makeFileSystemBasedRouterMap("controllers");
+
+export default async (request: Request): Promise<Response> => {
+  const url = new URL(request.url);
+  for (const router of routers) {
+    if (router.method !== request.method) continue;
+
+    const matches = router.route.exec(url.pathname);
+    if (!matches) continue;
+
+    const param = Object.fromEntries(
+      router.keys.map((key, index) => [key, matches[index + 1]]),
+    );
+
+    try {
+      const body = await tryCatch(() => request.json());
+      const result = await router.handler({
+        param,
+        query: Object.fromEntries(url.searchParams.entries()),
+        body: body || {},
+        request,
+      });
+      return response(result, "OK");
+    } catch (error) {
+      console.error(error);
+      if (error instanceof HttpError) {
+        return response({ error: error.message }, error.status);
+      }
+      return response(
+        { error: "Internal Server Error" },
+        "INTERNAL_SERVER_ERROR",
+      );
+    }
+  }
+
+  return response({ error: "Not Found" }, "NOT_FOUND");
+};
