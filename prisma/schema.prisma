@@ -52,7 +52,7 @@ model Blog {
   rss       String   @db.Text()
   main      Boolean  @default(false)
   createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @updatedAt @map("updated_at") @db.Timestamp()
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts          Post[]
@@ -70,9 +70,9 @@ model Post {
   title       String   @db.VarChar(255)
   content     String   @db.Text()
   url         String   @unique @db.VarChar(512)
-  publishedAt DateTime @db.Timestamp()
+  publishedAt DateTime @map("published_at") @db.Timestamp()
   createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp()
+  updatedAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @updatedAt @map("updated_at") @db.Timestamp()
 
   blog     Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
   user     User      @relation(fields: [userId], references: [id])
@@ -80,6 +80,7 @@ model Post {
 
   @@unique([id, blogId], name: "postBlogIdIndex")
   @@unique([id, userId], name: "postUserIdIndex")
+  @@index([publishedAt], name: "publishedAtIndex")
   @@map("posts")
 }
 

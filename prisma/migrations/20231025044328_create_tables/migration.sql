@@ -34,7 +34,7 @@ CREATE TABLE `blogs` (
     `rss` TEXT NOT NULL,
     `main` BOOLEAN NOT NULL DEFAULT false,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    `updated_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 
     UNIQUE INDEX `blogs_id_user_id_key`(`id`, `user_id`),
     UNIQUE INDEX `blogs_user_id_name_key`(`user_id`, `name`),
@@ -49,11 +49,12 @@ CREATE TABLE `posts` (
     `title` VARCHAR(255) NOT NULL,
     `content` TEXT NOT NULL,
     `url` VARCHAR(512) NOT NULL,
-    `publishedAt` TIMESTAMP NOT NULL,
+    `published_at` TIMESTAMP NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    `updated_at` TIMESTAMP NOT NULL,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 
     UNIQUE INDEX `posts_url_key`(`url`),
+    INDEX `publishedAtIndex`(`published_at`),
     UNIQUE INDEX `posts_id_blog_id_key`(`id`, `blog_id`),
     UNIQUE INDEX `posts_id_user_id_key`(`id`, `user_id`),
     PRIMARY KEY (`id`)

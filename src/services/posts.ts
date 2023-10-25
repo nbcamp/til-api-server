@@ -1,10 +1,21 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 
-export function findAllByUserId(userId: number) {
+export function findAll(input: {
+  userId?: number;
+  cursor?: number;
+  limit?: number;
+  desc?: boolean;
+}) {
   return prisma.post.findMany({
-    where: { userId },
+    where: input.userId ? { userId: input.userId } : undefined,
     include: { postTags: true },
+    ...(input.cursor && {
+      cursor: { id: input.cursor },
+      skip: 1,
+    }),
+    take: input.limit ?? 100,
+    orderBy: { publishedAt: input.desc ? "desc" : "asc" },
   });
 }
 
