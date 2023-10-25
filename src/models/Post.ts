@@ -1,8 +1,30 @@
+import { toUnixTime } from "utils/unixtime";
+
 export class Post {
   id!: number;
   title!: string;
   content!: string;
-  url!: string | null;
+  url!: string;
   tags!: string[];
-  publishedAt!: number | null;
+  publishedAt!: number;
+}
+
+export interface RawPost {
+  id: number;
+  title: string;
+  content: string;
+  url: string;
+  postTags: { tag: string }[];
+  publishedAt: Date;
+}
+
+export function toPost(raw: RawPost): Post {
+  return {
+    id: raw.id,
+    title: raw.title,
+    content: raw.content,
+    url: raw.url,
+    tags: raw.postTags.map(({ tag }) => tag),
+    publishedAt: toUnixTime(raw.publishedAt),
+  };
 }

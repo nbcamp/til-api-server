@@ -1,11 +1,9 @@
 import { createRouter } from "router";
+import { jwt, users } from "services";
+import { Auth } from "models";
+
 import { HttpError } from "utils/http";
 import { nullable } from "utils/validator";
-
-import * as users from "services/users";
-import * as jwt from "services/jwt";
-
-import { Auth } from "models/Auth";
 
 export default createRouter({
   method: "POST",

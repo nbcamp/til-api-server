@@ -2,8 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
+  binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -18,7 +19,7 @@ model User {
   provider     String?   @map("provider") @db.VarChar(10)
   providerId   String?   @map("provider_id") @db.VarChar(100)
   createdAt    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @updatedAt @map("updated_at") @db.Timestamp()
+  updatedAt    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
   lastSignedAt DateTime? @map("last_signed_at") @db.Timestamp()
   deletedAt    DateTime? @map("deleted_at") @db.Timestamp()
 
@@ -52,7 +53,7 @@ model Blog {
   rss       String   @db.Text()
   main      Boolean  @default(false)
   createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @updatedAt @map("updated_at") @db.Timestamp()
+  updatedAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts          Post[]
@@ -72,7 +73,7 @@ model Post {
   url         String   @unique @db.VarChar(512)
   publishedAt DateTime @map("published_at") @db.Timestamp()
   createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @updatedAt @map("updated_at") @db.Timestamp()
+  updatedAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
 
   blog     Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
   user     User      @relation(fields: [userId], references: [id])
@@ -81,6 +82,7 @@ model Post {
   @@unique([id, blogId], name: "postBlogIdIndex")
   @@unique([id, userId], name: "postUserIdIndex")
   @@index([publishedAt], name: "publishedAtIndex")
+  @@fulltext([title, content])
   @@map("posts")
 }
 
@@ -92,6 +94,7 @@ model PostTag {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([postId, tag], name: "postTagIndex")
+  @@fulltext([tag])
   @@map("post_tags")
 }
 

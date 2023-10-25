@@ -1,11 +1,9 @@
 import { createRouter } from "router";
+import { posts } from "services";
+import { Post, toPost } from "models";
+
 import { HttpError } from "utils/http";
 import { optional } from "utils/validator";
-import { toUnixTime } from "utils/unixtime";
-
-import * as posts from "services/posts";
-
-import { Post } from "models/Post";
 
 export default createRouter({
   authorized: true,
@@ -17,14 +15,7 @@ export default createRouter({
     if (!post) {
       throw new HttpError("Not found", "NOT_FOUND");
     }
-    return {
-      id: post.id,
-      title: post.title,
-      content: post.content,
-      url: post.url,
-      tags: post.postTags.map(({ tag }) => tag),
-      publishedAt: toUnixTime(post.publishedAt),
-    };
+    return toPost(post);
   },
 });
 
@@ -40,13 +31,6 @@ export const UPDATE = createRouter({
       url: ctx.body.url,
       tags: ctx.body.tags,
     });
-    return {
-      id: post.id,
-      title: post.title,
-      content: post.content,
-      url: post.url,
-      tags: post.postTags.map(({ tag }) => tag),
-      publishedAt: toUnixTime(post.publishedAt),
-    };
+    return toPost(post);
   },
 });

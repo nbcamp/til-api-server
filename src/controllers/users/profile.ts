@@ -1,19 +1,14 @@
 import { createRouter } from "router";
+import { User, toUser } from "models";
+import { users } from "services";
+
 import { nullable, optional } from "utils/validator";
-
-import * as users from "services/users";
-
-import { User } from "models/User";
 
 export default createRouter({
   authorized: true,
   async handler(ctx): Promise<User> {
     const user = ctx.auth.user;
-    return {
-      id: user.id,
-      username: user.username,
-      avatarUrl: user.avatarUrl,
-    };
+    return toUser(user);
   },
 });
 

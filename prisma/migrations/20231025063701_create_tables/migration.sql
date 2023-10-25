@@ -57,6 +57,7 @@ CREATE TABLE `posts` (
     INDEX `publishedAtIndex`(`published_at`),
     UNIQUE INDEX `posts_id_blog_id_key`(`id`, `blog_id`),
     UNIQUE INDEX `posts_id_user_id_key`(`id`, `user_id`),
+    FULLTEXT INDEX `posts_title_content_idx`(`title`, `content`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -67,6 +68,7 @@ CREATE TABLE `post_tags` (
     `tag` VARCHAR(20) NOT NULL,
 
     UNIQUE INDEX `post_tags_post_id_tag_key`(`post_id`, `tag`),
+    FULLTEXT INDEX `post_tags_tag_idx`(`tag`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -1,18 +1,27 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
+import { fromUnixTime } from "utils/unixtime";
 
 export function findAll(input: {
   userId?: number;
   cursor?: number;
   limit?: number;
   desc?: boolean;
+  q?: string;
 }) {
   return prisma.post.findMany({
-    where: input.userId ? { userId: input.userId } : undefined,
+    where: {
+      userId: input.userId,
+      OR: [
+        { title: { search: input.q } },
+        { content: { search: input.q } },
+        { postTags: { some: { tag: { search: input.q } } } },
+      ],
+    },
     include: { postTags: true },
     ...(input.cursor && {
       cursor: { id: input.cursor },
-      skip: 1,
+      skip: input.cursor && 1,
     }),
     take: input.limit ?? 100,
     orderBy: { publishedAt: input.desc ? "desc" : "asc" },
@@ -22,6 +31,44 @@ export function findAll(input: {
 export function findOneById(input: { postId: number; userId: number }) {
   return prisma.post.findFirst({
     where: { id: input.postId, userId: input.userId },
+    include: { postTags: true },
+  });
+}
+
+export async function create(input: {
+  userId: number;
+  blogId: number;
+  title: string;
+  content: string;
+  url: string;
+  publishedAt: number;
+}) {
+  const blog = await prisma.blog.findUnique({ where: { id: input.blogId } });
+
+  if (!blog) {
+    throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
+  }
+
+  if (!input.url.includes(blog.url)) {
+    throw new HttpError(
+      "해당 TIL의 URL은 소유하지 않은 블로그의 주소입니다.",
+      "BAD_REQUEST",
+    );
+  }
+
+  if (await prisma.post.findFirst({ where: { url: input.url } })) {
+    throw new HttpError("이미 등록한 URL입니다.", "BAD_REQUEST");
+  }
+
+  return prisma.post.create({
+    data: {
+      blogId: input.blogId,
+      userId: input.userId,
+      title: input.title,
+      content: input.content,
+      url: input.url,
+      publishedAt: fromUnixTime(input.publishedAt),
+    },
     include: { postTags: true },
   });
 }

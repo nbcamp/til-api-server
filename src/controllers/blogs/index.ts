@@ -1,23 +1,12 @@
 import { createRouter } from "router";
-import { toUnixTime } from "utils/unixtime";
-
-import * as blogs from "services/blogs";
-
-import { Blog } from "models/Blog";
+import { blogs } from "services";
+import { Blog, toBlog } from "models";
 
 export default createRouter({
   authorized: true,
   async handler(ctx): Promise<Blog[]> {
     const list = await blogs.findAllByUserId(ctx.auth.user.id);
-    return list.map((blog) => ({
-      id: blog.id,
-      name: blog.name,
-      url: blog.url,
-      rss: blog.rss,
-      main: blog.main,
-      keywords: blog.keywordTagMaps as Blog["keywords"],
-      createdAt: toUnixTime(blog.createdAt),
-    }));
+    return list.map(toBlog);
   },
 });
 
@@ -41,14 +30,6 @@ export const CREATE = createRouter({
       userId: ctx.auth.user.id,
     });
 
-    return {
-      id: blog.id,
-      name: blog.name,
-      url: blog.url,
-      rss: blog.rss,
-      main: blog.main,
-      keywords: blog.keywordTagMaps as Blog["keywords"],
-      createdAt: toUnixTime(blog.createdAt),
-    };
+    return toBlog(blog);
   },
 });
