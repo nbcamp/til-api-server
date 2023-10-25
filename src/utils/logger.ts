@@ -1,6 +1,6 @@
 import winston from "winston";
 
-const colorizer = winston.format.colorize();
+const colorize = winston.format.colorize().colorize;
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -21,28 +21,30 @@ const logger = winston.createLogger({
         timestamp: "dim",
         stack: "yellow",
         method: "blue",
+        label: "magenta",
         url: "yellow",
         ms: "dim",
       },
     }),
     winston.format.printf(
-      ({ timestamp, level, message, request, error, ms, ...meta }) => {
+      ({ label, timestamp, level, message, request, error, ms, ...meta }) => {
         function build(body: string) {
-          const header = `${colorizer.colorize("timestamp", `${timestamp}`)}`;
-          const footer = `${colorizer.colorize("ms", `${ms}`)}`;
-          return `${header} ${level} ${body} ${footer}`;
+          const header = `${colorize("timestamp", `${timestamp}`)}`;
+          const labelText = label ? colorize("label", `${label} `) : "";
+          const footer = `${colorize("ms", `${ms}`)}`;
+          return `${header} ${level} ${labelText}${body} ${footer}`;
         }
 
         if (request instanceof Request) {
           const url = new URL(request.url);
-          const method = colorizer.colorize("method", request.method);
-          const pathname = colorizer.colorize("url", url.pathname);
+          const method = colorize("method", request.method);
+          const pathname = colorize("url", url.pathname);
           return build(`${method} ${pathname}`);
         }
 
         if (error instanceof Error) {
           const errorMessage = (error.stack ?? error.message) || `${error}`;
-          const stack = colorizer.colorize("stack", errorMessage);
+          const stack = colorize("stack", errorMessage);
           return build(`${message}\n${stack}`);
         }
 
