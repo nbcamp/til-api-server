@@ -28,11 +28,11 @@ const logger = winston.createLogger({
     }),
     winston.format.printf(
       ({ label, timestamp, level, message, request, error, ms, ...meta }) => {
-        function build(body: string) {
+        function build(body: string, meta: string = "") {
           const header = `${colorize("timestamp", `${timestamp}`)}`;
-          const labelText = label ? colorize("label", `${label} `) : "";
+          const name = label ? colorize("label", `${label} `) : "";
           const footer = `${colorize("ms", `${ms}`)}`;
-          return `${header} ${level} ${labelText}${body} ${footer}`;
+          return `${header} ${level} ${name}${body} ${footer} ${meta}`;
         }
 
         if (request instanceof Request) {
@@ -45,12 +45,12 @@ const logger = winston.createLogger({
         if (error instanceof Error) {
           const errorMessage = (error.stack ?? error.message) || `${error}`;
           const stack = colorize("stack", errorMessage);
-          return build(`${message}\n${stack}`);
+          return build(message, `\n${stack}`);
         }
 
         const metaString = JSON.stringify(meta, null, 2);
         const metaStringified = metaString === "{}" ? "" : `\n${metaString}`;
-        return build(`${message}${metaStringified}`);
+        return build(message, metaStringified);
       },
     ),
   ),

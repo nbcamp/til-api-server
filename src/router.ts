@@ -8,8 +8,7 @@ import { tryCatch } from "utils/tryCatch";
 import { HttpError, HttpMethod, response } from "utils/http";
 import { InferType, TypeDescriptor, validate } from "utils/validator";
 
-import * as jwt from "services/jwt";
-import * as users from "services/users";
+import { jwt, users } from "services";
 
 interface Body {
   [key: string]: any;
@@ -83,17 +82,6 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
     ...router,
     method: router.method ?? "GET",
     async handler(context) {
-      if (router.descriptor) {
-        const result = validate(context.body, router.descriptor);
-        if (!result.valid) {
-          const error = result.errors[0];
-          throw new HttpError(
-            `요청 정보가 올바르지 않습니다. (reason: ${error.reason}, from: ${error.property})`,
-            "BAD_REQUEST",
-          );
-        }
-      }
-
       if (router.authorized) {
         const authorization = context.request.headers.get("Authorization");
         const [tokenType, token] = authorization?.split(" ") ?? [];
@@ -115,6 +103,17 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
             "인증 정보가 올바르지 않습니다.",
             "UNAUTHORIZED",
             error as Error,
+          );
+        }
+      }
+
+      if (router.descriptor) {
+        const result = validate(context.body, router.descriptor);
+        if (!result.valid) {
+          const error = result.errors[0];
+          throw new HttpError(
+            `요청 정보가 올바르지 않습니다. (reason: ${error.reason}, from: ${error.property})`,
+            "BAD_REQUEST",
           );
         }
       }
