@@ -83,9 +83,9 @@ export async function update(
       );
     }
   }
-  const blog = await findMainByUserId(input.userId);
+  const blog = await prisma.blog.findFirst({ where: { id } });
   if (!blog) {
-    throw new HttpError("등록한 블로그가 없습니다.", "NOT_FOUND");
+    throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
   }
 
   return prisma.blog.update({
