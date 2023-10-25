@@ -1,5 +1,5 @@
 export { Auth } from "./Auth";
-export { User, RawUser, toUser } from "./User";
-export { Blog, RawBlog, toBlog } from "./Blog";
-export { Post, RawPost, toPost } from "./Post";
-export { KeywordTags, RawKeywordTags, toKeywordTags } from "./KeywordTags";
+export { User, toUser, type RawUser } from "./User";
+export { Blog, toBlog, type RawBlog } from "./Blog";
+export { Post, toPost, type RawPost } from "./Post";
+export { KeywordTags, toKeywordTags, type RawKeywordTags } from "./KeywordTags";

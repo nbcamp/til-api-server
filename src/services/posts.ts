@@ -1,6 +1,6 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
-import { fromUnixTime } from "utils/unixtime";
+import { toDate } from "utils/unixtime";
 
 export function findAll(input: {
   userId?: number;
@@ -12,11 +12,13 @@ export function findAll(input: {
   return prisma.post.findMany({
     where: {
       userId: input.userId,
-      OR: [
-        { title: { search: input.q } },
-        { content: { search: input.q } },
-        { postTags: { some: { tag: { search: input.q } } } },
-      ],
+      ...(input.q && {
+        OR: [
+          { title: { search: input.q } },
+          { content: { search: input.q } },
+          { postTags: { some: { tag: { search: input.q } } } },
+        ],
+      }),
     },
     include: { postTags: true },
     ...(input.cursor && {
@@ -67,7 +69,7 @@ export async function create(input: {
       title: input.title,
       content: input.content,
       url: input.url,
-      publishedAt: fromUnixTime(input.publishedAt),
+      publishedAt: toDate(input.publishedAt),
     },
     include: { postTags: true },
   });
