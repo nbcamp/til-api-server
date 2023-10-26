@@ -9,6 +9,7 @@
     "migrate:prod": "prisma migrate deploy",
     "migrate:dev": "prisma migrate dev",
     "update": "bunx npm-check-updates -ui",
+    "lint:fix": "eslint --fix --ext .ts .",
     "lint": "eslint --ext .ts .",
     "tsc": "tsc --noEmit"
   },

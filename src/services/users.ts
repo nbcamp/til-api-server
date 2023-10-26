@@ -16,10 +16,10 @@ export async function findByProvider(provider: string, providerId: string) {
 }
 
 export function create(input: {
-  username: string | null;
-  avatarUrl: string | null;
-  provider: string | null;
-  providerId: string | null;
+  username?: string | null;
+  avatarUrl?: string | null;
+  provider: string;
+  providerId: string;
 }) {
   return prisma.user.create({
     data: { ...input },

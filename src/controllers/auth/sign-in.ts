@@ -3,15 +3,15 @@ import { jwt, users } from "services";
 import { Auth } from "models";
 
 import { HttpError } from "utils/http";
-import { nullable } from "utils/validator";
+import { nullable, optional } from "utils/validator";
 
 export default createRouter({
   method: "POST",
   descriptor: {
-    username: nullable("string"),
-    avatarUrl: nullable("string"),
     provider: "string",
     providerId: "string",
+    username: optional(nullable("string")),
+    avatarUrl: optional(nullable("string")),
   },
   async handler(ctx): Promise<Auth> {
     const input = ctx.body;
