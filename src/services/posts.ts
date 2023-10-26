@@ -1,6 +1,6 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
-import { toDate } from "utils/unixtime";
+import { stringToDate } from "utils/datetime";
 
 export function findAll(input: {
   userId?: number;
@@ -43,7 +43,7 @@ export async function create(input: {
   title: string;
   content: string;
   url: string;
-  publishedAt: number;
+  publishedAt: string;
 }) {
   const blog = await prisma.blog.findUnique({ where: { id: input.blogId } });
 
@@ -69,7 +69,7 @@ export async function create(input: {
       title: input.title,
       content: input.content,
       url: input.url,
-      publishedAt: toDate(input.publishedAt),
+      publishedAt: stringToDate(input.publishedAt),
     },
     include: { postTags: true },
   });

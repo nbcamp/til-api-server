@@ -1,4 +1,4 @@
-import { toUnixTime } from "utils/unixtime";
+import { dateToString } from "utils/datetime";
 import { KeywordTags, RawKeywordTags, toKeywordTags } from "./KeywordTags";
 
 export class Blog {
@@ -8,7 +8,7 @@ export class Blog {
   rss!: string;
   main!: boolean;
   keywords!: KeywordTags[];
-  createdAt!: number;
+  createdAt!: string;
 }
 
 export interface RawBlog {
@@ -29,6 +29,6 @@ export function toBlog(blog: RawBlog): Blog {
     rss: blog.rss,
     main: blog.main,
     keywords: blog.keywordTagMaps.map(toKeywordTags),
-    createdAt: toUnixTime(blog.createdAt),
+    createdAt: dateToString(blog.createdAt),
   };
 }

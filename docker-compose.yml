@@ -9,19 +9,16 @@ services:
       - ${PORT}:${PORT}
     depends_on:
       - db
-    networks:
-      - api-network
     command: ["/home/bun/app/wait-for-db.sh"]
 
   db:
     image: mysql:8.1.0
     container_name: ${DK_IMAGE}-db
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-      TZ: ${TZ}
+      TZ: UTC
     volumes:
       - mysql-data:/var/lib/mysql
     ports:

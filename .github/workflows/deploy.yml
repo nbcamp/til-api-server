@@ -63,8 +63,8 @@ jobs:
             sudo docker network rm api-network || true
             sudo docker network create api-network
             sudo docker run --network api-network --name ${{ secrets.DK_IMAGE }}-db \
-                       -e MYSQL_DATABASE=${{ secrets.DB_DATABASE }} -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} -e TZ=${{ secrets.TZ }} \
-                       -v mysql-data:/var/lib/mysql -p ${{ secrets.DB_PORT }}:3306 -d mysql:8.1.0 --default-authentication-plugin=mysql_native_password
+                       -e MYSQL_DATABASE=${{ secrets.DB_DATABASE }} -e MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }} -e TZ=UTC \
+                       -v mysql-data:/var/lib/mysql -p ${{ secrets.DB_PORT }}:3306 -d mysql:8.1.0
             sudo docker run --network api-network --add-host host.docker.internal:host-gateway --name ${{ secrets.DK_IMAGE }} \
                        --link ${{ secrets.DK_IMAGE }}-db:db -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
                        -d ${{ secrets.DK_USERNAME }}/${{ secrets.DK_IMAGE }}:latest /home/bun/app/wait-for-db.sh

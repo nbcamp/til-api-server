@@ -1,4 +1,4 @@
-import { toUnixTime } from "utils/unixtime";
+import { dateToString } from "utils/datetime";
 
 export class Post {
   id!: number;
@@ -6,7 +6,7 @@ export class Post {
   content!: string;
   url!: string;
   tags!: string[];
-  publishedAt!: number;
+  publishedAt!: string;
 }
 
 export interface RawPost {
@@ -25,6 +25,6 @@ export function toPost(raw: RawPost): Post {
     content: raw.content,
     url: raw.url,
     tags: raw.postTags.map(({ tag }) => tag),
-    publishedAt: toUnixTime(raw.publishedAt),
+    publishedAt: dateToString(raw.publishedAt),
   };
 }
