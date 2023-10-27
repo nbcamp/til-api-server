@@ -24,7 +24,7 @@ export function findAll(input: {
     include: { postTags: true },
     ...(input.cursor && {
       cursor: { id: input.cursor },
-      skip: input.cursor && 1,
+      skip: 1,
     }),
     take: input.limit ?? 100,
     orderBy: { publishedAt: input.desc ? "desc" : "asc" },

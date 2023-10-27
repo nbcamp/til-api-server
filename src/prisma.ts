@@ -19,10 +19,11 @@ export const prisma = new PrismaClient({
 
 const option = { label: "ORM" };
 
-prisma.$on("query", (event) => {
-  logger.info("Query: " + event.query, option);
-  logger.info("Params: " + JSON.stringify(event.params), option);
-  logger.info("Duration: " + event.duration + "ms", option);
+prisma.$on("query", ({ query, params, duration }) => {
+  const sanitizedQuery = query
+    .replace(/`(\w+)`\./g, "")
+    .replace(/SELECT\s+(.*)\s+FROM/, "SELECT * FROM");
+  logger.info(`Query: ${sanitizedQuery} ${params} ${duration}ms`, option);
 });
 
 prisma.$on("info", (event) => {
