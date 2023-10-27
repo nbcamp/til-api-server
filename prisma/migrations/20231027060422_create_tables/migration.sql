@@ -33,6 +33,7 @@ CREATE TABLE `blogs` (
     `url` TEXT NOT NULL,
     `rss` TEXT NOT NULL,
     `main` BOOLEAN NOT NULL DEFAULT false,
+    `last_published_at` TIMESTAMP NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 
@@ -46,8 +47,8 @@ CREATE TABLE `posts` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `blog_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `content` TEXT NOT NULL,
+    `title` VARCHAR(50) NOT NULL,
+    `content` VARCHAR(100) NOT NULL,
     `url` VARCHAR(512) NOT NULL,
     `published_at` TIMESTAMP NOT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),

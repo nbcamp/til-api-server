@@ -1,6 +1,6 @@
 import { createRouter } from "router";
 import { jwt, users } from "services";
-import { Auth } from "models";
+import { Auth, toUser } from "models";
 
 import { HttpError } from "utils/http";
 import { nullable, optional } from "utils/validator";
@@ -26,6 +26,7 @@ export default createRouter({
 
     return {
       accessToken: jwt.sign({ id: user.id }),
+      user: toUser(user),
     };
   },
 });

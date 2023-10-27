@@ -46,14 +46,15 @@ model Follow {
 }
 
 model Blog {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  name      String   @db.VarChar(20)
-  url       String   @db.Text()
-  rss       String   @db.Text()
-  main      Boolean  @default(false)
-  createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
+  id              Int       @id @default(autoincrement())
+  userId          Int       @map("user_id")
+  name            String    @db.VarChar(20)
+  url             String    @db.Text()
+  rss             String    @db.Text()
+  main            Boolean   @default(false)
+  lastPublishedAt DateTime? @map("last_published_at") @db.Timestamp()
+  createdAt       DateTime  @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
+  updatedAt       DateTime  @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts          Post[]
@@ -68,8 +69,8 @@ model Post {
   id          Int      @id @default(autoincrement())
   blogId      Int      @map("blog_id")
   userId      Int      @map("user_id")
-  title       String   @db.VarChar(255)
-  content     String   @db.Text()
+  title       String   @db.VarChar(50)
+  content     String   @db.VarChar(100)
   url         String   @unique @db.VarChar(512)
   publishedAt DateTime @map("published_at") @db.Timestamp()
   createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()

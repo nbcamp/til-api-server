@@ -1,6 +1,7 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
-import { stringToDate } from "utils/datetime";
+import { unixTimeToDate } from "utils/datetime";
+import { isBefore } from "date-fns";
 
 export function findAll(input: {
   userId?: number;
@@ -43,7 +44,7 @@ export async function create(input: {
   title: string;
   content: string;
   url: string;
-  publishedAt: string;
+  publishedAt: number;
 }) {
   const blog = await prisma.blog.findUnique({ where: { id: input.blogId } });
 
@@ -62,16 +63,26 @@ export async function create(input: {
     throw new HttpError("이미 등록한 URL입니다.", "BAD_REQUEST");
   }
 
-  return prisma.post.create({
-    data: {
-      blogId: input.blogId,
-      userId: input.userId,
-      title: input.title,
-      content: input.content,
-      url: input.url,
-      publishedAt: stringToDate(input.publishedAt),
-    },
-    include: { postTags: true },
+  return prisma.$transaction(async (tx) => {
+    const publishedAt = unixTimeToDate(input.publishedAt);
+    if (!blog.lastPublishedAt || isBefore(blog.lastPublishedAt, publishedAt)) {
+      await tx.blog.update({
+        where: { id: input.blogId },
+        data: { lastPublishedAt: publishedAt },
+      });
+    }
+
+    return tx.post.create({
+      data: {
+        blogId: input.blogId,
+        userId: input.userId,
+        title: input.title,
+        content: input.content,
+        url: input.url,
+        publishedAt,
+      },
+      include: { postTags: true },
+    });
   });
 }
 
