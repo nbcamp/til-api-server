@@ -2,9 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "fullTextIndex"]
-  binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -83,7 +82,6 @@ model Post {
   @@unique([id, blogId], name: "postBlogIdIndex")
   @@unique([id, userId], name: "postUserIdIndex")
   @@index([publishedAt], name: "publishedAtIndex")
-  @@fulltext([title, content])
   @@map("posts")
 }
 
@@ -95,7 +93,6 @@ model PostTag {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([postId, tag], name: "postTagIndex")
-  @@fulltext([tag])
   @@map("post_tags")
 }
 

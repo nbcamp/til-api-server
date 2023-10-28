@@ -23,7 +23,7 @@ prisma.$on("query", ({ query, params, duration }) => {
   const sanitizedQuery = query
     .replace(/`(\w+)`\./g, "")
     .replace(/SELECT\s+(.*)\s+FROM/, "SELECT * FROM");
-  logger.info(`Query: ${sanitizedQuery} ${params} ${duration}ms`, option);
+  logger.info(`${sanitizedQuery} ${params} ${duration}ms`, option);
 });
 
 prisma.$on("info", (event) => {

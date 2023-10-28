@@ -10,14 +10,15 @@ export function findAll(input: {
   desc?: boolean;
   q?: string;
 }) {
+  const q = input.q?.trim();
   return prisma.post.findMany({
     where: {
       userId: input.userId,
-      ...(input.q && {
+      ...(q && {
         OR: [
-          { title: { search: input.q } },
-          { content: { search: input.q } },
-          { postTags: { some: { tag: { search: input.q } } } },
+          { title: { contains: q } },
+          { content: { contains: q } },
+          { postTags: { some: { tag: { contains: q } } } },
         ],
       }),
     },
@@ -44,6 +45,7 @@ export async function create(input: {
   title: string;
   content: string;
   url: string;
+  tags: string[];
   publishedAt: number;
 }) {
   const blog = await prisma.blog.findUnique({ where: { id: input.blogId } });
@@ -79,6 +81,9 @@ export async function create(input: {
         title: input.title,
         content: input.content,
         url: input.url,
+        postTags: {
+          create: input.tags.map((tag) => ({ tag })),
+        },
         publishedAt,
       },
       include: { postTags: true },
