@@ -1,14 +1,18 @@
 import { createRouter } from "router";
-import { User, toUser } from "models";
+import { User, UserMetrics, toUser } from "models";
 import { users } from "services";
 
 import { nullable, optional } from "utils/validator";
 
 export default createRouter({
   authorized: true,
-  async handler(ctx): Promise<User> {
+  async handler(ctx): Promise<User & UserMetrics> {
     const user = ctx.auth.user;
-    return toUser(user);
+    const metrics = await users.metrics(user.id);
+    return {
+      ...toUser(user),
+      ...metrics,
+    };
   },
 });
 
@@ -21,11 +25,7 @@ export const UPDATE = createRouter({
   },
   async handler(ctx): Promise<User> {
     const user = await users.update(ctx.auth.user.id, ctx.body);
-    return {
-      id: user.id,
-      username: user.username,
-      avatarUrl: user.avatarUrl,
-    };
+    return toUser(user);
   },
 });
 

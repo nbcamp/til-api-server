@@ -118,17 +118,28 @@ export async function update(
     );
   }
 
-  return prisma.post.update({
-    where: { id },
-    data: {
-      url: input.url,
-      postTags: {
-        deleteMany: {},
-        create: input.tags?.map((tag) => ({ tag })),
+  return prisma.$transaction(async (tx) => {
+    if (input.tags?.length) {
+      await tx.blog.update({
+        where: { id: post.blogId },
+        data: {
+          lastPublishedAt: null,
+        },
+      });
+    }
+
+    return prisma.post.update({
+      where: { id },
+      data: {
+        url: input.url,
+        postTags: {
+          deleteMany: {},
+          create: input.tags?.map((tag) => ({ tag })),
+        },
       },
-    },
-    include: {
-      postTags: true,
-    },
+      include: {
+        postTags: true,
+      },
+    });
   });
 }

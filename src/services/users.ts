@@ -15,6 +15,18 @@ export async function findByProvider(provider: string, providerId: string) {
   });
 }
 
+export function metrics(id: number) {
+  return prisma.$transaction(async (tx) => {
+    const [posts, followers, followings] = await Promise.all([
+      tx.post.count({ where: { userId: id } }),
+      tx.follow.count({ where: { followingId: id } }),
+      tx.follow.count({ where: { followerId: id } }),
+    ]);
+
+    return { posts, followers, followings };
+  });
+}
+
 export function create(input: {
   username?: string | null;
   avatarUrl?: string | null;

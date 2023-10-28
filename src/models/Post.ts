@@ -2,6 +2,7 @@ import { dateToUnixTime } from "utils/datetime";
 
 export class Post {
   id!: number;
+  userId!: number;
   title!: string;
   content!: string;
   url!: string;
@@ -11,6 +12,7 @@ export class Post {
 
 export interface RawPost {
   id: number;
+  userId: number;
   title: string;
   content: string;
   url: string;
@@ -21,6 +23,7 @@ export interface RawPost {
 export function toPost(raw: RawPost): Post {
   return {
     id: raw.id,
+    userId: raw.userId,
     title: raw.title,
     content: raw.content,
     url: raw.url,

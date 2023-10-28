@@ -4,6 +4,12 @@ export class User {
   avatarUrl!: string | null;
 }
 
+export class UserMetrics {
+  posts!: number;
+  followers!: number;
+  followings!: number;
+}
+
 export interface RawUser {
   id: number;
   username: string | null;
