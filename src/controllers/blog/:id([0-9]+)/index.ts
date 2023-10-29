@@ -33,6 +33,7 @@ export const UPDATE = createRouter({
     const blog = await blogs.update(+ctx.param.id, {
       name: ctx.body.name,
       userId: ctx.auth.user.id,
+      keywords: ctx.body.keywords,
     });
     return toBlog(blog);
   },
