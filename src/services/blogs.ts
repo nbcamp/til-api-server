@@ -74,7 +74,7 @@ export async function update(
 ) {
   if (input.name) {
     const blog = await prisma.blog.findFirst({
-      where: { userId: input.userId, name: input.name },
+      where: { userId: input.userId, name: input.name, NOT: { id } },
     });
     if (blog) {
       throw new HttpError(
