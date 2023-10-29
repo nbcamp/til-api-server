@@ -13,6 +13,11 @@ export default createRouter({
     };
 
     const list = await users.findFollowers(options);
-    return list.map(toUser);
+    return Promise.all(
+      list.map(async (user) => {
+        const metrics = await users.metrics(user.id);
+        return toUser({ ...user, ...metrics });
+      }),
+    );
   },
 });
