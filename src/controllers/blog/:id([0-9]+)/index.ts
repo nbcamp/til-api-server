@@ -22,7 +22,6 @@ export const UPDATE = createRouter({
   authorized: true,
   descriptor: {
     name: optional("string"),
-    main: optional("boolean"),
     keywords: optional([
       {
         keyword: "string",
@@ -33,7 +32,6 @@ export const UPDATE = createRouter({
   async handler(ctx): Promise<Blog> {
     const blog = await blogs.update(+ctx.param.id, {
       name: ctx.body.name,
-      main: ctx.body.main,
       userId: ctx.auth.user.id,
     });
     return toBlog(blog);

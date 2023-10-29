@@ -64,7 +64,6 @@ export async function update(
   id: number,
   input: {
     name?: string;
-    main?: boolean;
     userId: number;
     keywords?: {
       keyword: string;
@@ -92,7 +91,6 @@ export async function update(
     where: { id },
     data: {
       name: input.name,
-      main: input.main,
       ...(input.keywords?.length && {
         keywordTagMaps: {
           deleteMany: {},
