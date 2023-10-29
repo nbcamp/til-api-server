@@ -88,19 +88,27 @@ export async function update(
     throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
   }
 
-  return prisma.blog.update({
-    where: { id },
-    data: {
-      name: input.name,
-      main: input.main,
-      ...(input.keywords?.length && {
-        keywordTagMaps: {
-          deleteMany: {},
-          createMany: { data: input.keywords },
-        },
-      }),
-    },
-    include: { keywordTagMaps: true },
+  return prisma.$transaction(async (tx) => {
+    if (input.main) {
+      await tx.blog.updateMany({
+        where: { userId: input.userId },
+        data: { main: false },
+      });
+    }
+    return tx.blog.update({
+      where: { id },
+      data: {
+        name: input.name,
+        main: input.main,
+        ...(input.keywords?.length && {
+          keywordTagMaps: {
+            deleteMany: {},
+            createMany: { data: input.keywords },
+          },
+        }),
+      },
+      include: { keywordTagMaps: true },
+    });
   });
 }
 
