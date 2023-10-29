@@ -10,7 +10,6 @@ export const CREATE = createRouter({
     title: "string",
     content: "string",
     url: "string",
-    tags: ["string"],
     publishedAt: "number",
   },
   async handler(ctx): Promise<Post> {

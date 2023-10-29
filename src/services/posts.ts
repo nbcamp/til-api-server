@@ -45,7 +45,6 @@ export async function create(input: {
   title: string;
   content: string;
   url: string;
-  tags: string[];
   publishedAt: number;
 }) {
   const blog = await prisma.blog.findUnique({ where: { id: input.blogId } });
@@ -74,6 +73,18 @@ export async function create(input: {
       });
     }
 
+    const keywordMaps = await tx.keywordTagMap.findMany({
+      where: { blogId: input.blogId },
+    });
+
+    const matched = keywordMaps.find(({ keyword }) =>
+      input.title.includes(keyword),
+    );
+
+    if (!matched) {
+      throw new HttpError("일치하는 키워드가 없습니다.", "BAD_REQUEST");
+    }
+
     return tx.post.create({
       data: {
         blogId: input.blogId,
@@ -82,7 +93,7 @@ export async function create(input: {
         content: input.content,
         url: input.url,
         postTags: {
-          create: input.tags.map((tag) => ({ tag })),
+          create: (matched.tags as string[]).map((tag) => ({ tag })),
         },
         publishedAt,
       },
