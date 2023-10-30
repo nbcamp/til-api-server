@@ -4,6 +4,10 @@ export async function findById(id: number) {
   return prisma.user.findUnique({ where: { id } });
 }
 
+export async function findByIds(ids: number[]) {
+  return prisma.user.findMany({ where: { id: { in: ids } } });
+}
+
 export async function findByProvider(provider: string, providerId: string) {
   return prisma.user.findUnique({
     where: {

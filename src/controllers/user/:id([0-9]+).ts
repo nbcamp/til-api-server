@@ -15,6 +15,6 @@ export default createRouter({
       throw new HttpError("사용자를 찾을 수 없습니다.", "NOT_FOUND");
     }
     const metrics = await users.metrics(user.id);
-    return toUser({ ...user, ...metrics });
+    return { ...toUser(user), ...metrics };
   },
 });

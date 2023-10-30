@@ -9,7 +9,7 @@ export default createRouter({
   async handler(ctx): Promise<User> {
     const user = ctx.auth.user;
     const metrics = await users.metrics(user.id);
-    return toUser({ ...user, ...metrics });
+    return { ...toUser(user), ...metrics };
   },
 });
 
@@ -25,7 +25,7 @@ export const UPDATE = createRouter({
       users.update(ctx.auth.user.id, ctx.body),
       users.metrics(ctx.auth.user.id),
     ]);
-    return toUser({ ...user, ...metrics });
+    return { ...toUser(user), ...metrics };
   },
 });
 

@@ -28,7 +28,7 @@ export default createRouter({
 
     return {
       accessToken: jwt.sign({ id: user.id }),
-      user: toUser({ ...user, ...metrics }),
+      user: { ...toUser(user), ...metrics },
     };
   },
 });
