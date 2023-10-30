@@ -7,9 +7,7 @@ import { nullable, optional } from "utils/validator";
 export default createRouter({
   authorized: true,
   async handler(ctx): Promise<User> {
-    const user = ctx.auth.user;
-    const metrics = await users.metrics(user.id);
-    return { ...toUser(user), ...metrics };
+    return users.withMetrics(toUser(ctx.auth.user));
   },
 });
 
@@ -21,11 +19,8 @@ export const UPDATE = createRouter({
     avatarUrl: optional(nullable("string")),
   },
   async handler(ctx): Promise<User> {
-    const [user, metrics] = await Promise.all([
-      users.update(ctx.auth.user.id, ctx.body),
-      users.metrics(ctx.auth.user.id),
-    ]);
-    return { ...toUser(user), ...metrics };
+    const user = await users.update(ctx.auth.user.id, ctx.body);
+    return users.withMetrics(toUser(user));
   },
 });
 

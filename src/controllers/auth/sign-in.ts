@@ -24,11 +24,9 @@ export default createRouter({
       .then((user) => user ?? users.create(input))
       .then((user) => users.sync(user.id));
 
-    const metrics = await users.metrics(user.id);
-
     return {
       accessToken: jwt.sign({ id: user.id }),
-      user: { ...toUser(user), ...metrics },
+      user: await users.withMetrics(toUser(user)),
     };
   },
 });

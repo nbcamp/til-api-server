@@ -20,13 +20,15 @@ export default createRouter({
     const postList = await posts.findAll(options);
     const userList = await users.findByIds(postList.map((post) => post.userId));
     return postList.length
-      ? postList.map((post) => {
-          const user = userList.find((user) => user.id === post.userId);
-          return {
-            post: toPost(post),
-            user: toUser(user!),
-          };
-        })
+      ? Promise.all(
+          postList.map(async (post) => {
+            const user = userList.find((user) => user.id === post.userId)!;
+            return {
+              post: toPost(post),
+              user: await users.withMetrics(toUser(user)),
+            };
+          }),
+        )
       : [];
   },
 });
