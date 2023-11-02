@@ -1,8 +1,9 @@
 import { createRouter } from "router";
-import { Blog, toBlog } from "models";
 import { blogs } from "services";
+import { Blog, toBlog } from "models";
 
-export const PATCH = createRouter({
+export const setMyMainBlog = createRouter({
+  description: "내 메인 블로그를 설정합니다.",
   method: "PATCH",
   authorized: true,
   async handler(ctx): Promise<Blog> {

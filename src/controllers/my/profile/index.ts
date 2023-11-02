@@ -4,14 +4,16 @@ import { users } from "services";
 
 import { nullable, optional } from "utils/validator";
 
-export default createRouter({
+export const getMyProfile = createRouter({
+  description: "내 프로필을 가져옵니다.",
   authorized: true,
   async handler(ctx): Promise<User> {
     return users.withMetrics(toUser(ctx.auth.user));
   },
 });
 
-export const UPDATE = createRouter({
+export const updateMyProfile = createRouter({
+  description: "내 프로필을 수정합니다.",
   method: "PATCH",
   authorized: true,
   descriptor: {
@@ -24,7 +26,8 @@ export const UPDATE = createRouter({
   },
 });
 
-export const DELETE = createRouter({
+export const withdrawMe = createRouter({
+  description: "내 프로필을 삭제합니다.",
   method: "DELETE",
   authorized: true,
   async handler(ctx): Promise<boolean> {

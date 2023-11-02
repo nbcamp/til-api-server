@@ -5,7 +5,8 @@ import { Auth, toUser } from "models";
 import { HttpError } from "utils/http";
 import { nullable, optional } from "utils/validator";
 
-export default createRouter({
+export const signIn = createRouter({
+  description: "사용자를 인증합니다.",
   method: "POST",
   descriptor: {
     provider: "string",

@@ -53,6 +53,7 @@ type Router<Descriptor extends TypeDescriptor> =
 type AnyRouter = Router<any>;
 
 interface MetaRouter<TDescriptor extends TypeDescriptor> {
+  description: string;
   method?: HttpMethod;
   descriptor?: TDescriptor;
   priority?: number;
@@ -132,6 +133,8 @@ interface NormalizedRouter {
   route: RegExp;
   keys: string[];
   priority: number;
+  operationId: string;
+  description: string;
   handler: AnyHandler;
 }
 
@@ -148,12 +151,13 @@ async function makeFileSystemBasedRouterMap(
         path.resolve(controllers, filename)
       );
 
-      const routers = Object.values(imported).reduce(
-        (acc, obj) => acc.concat(obj),
-        [] as AnyRouter[],
+      const routers: [string, AnyRouter][] = Object.entries(imported).reduce(
+        (acc, [key, value]) =>
+          key === "default" ? acc : [...acc, [key, value]],
+        [] as [string, AnyRouter][],
       );
 
-      return routers.map((router) => {
+      return routers.map(([operationId, router]) => {
         const keys: Key[] = [];
         return {
           ...router,
@@ -164,11 +168,22 @@ async function makeFileSystemBasedRouterMap(
           }),
           keys: keys.map((key) => `${key.name}`),
           priority: router.priority ?? 1000,
+          description: router.description ?? "",
+          operationId,
           handler: router.handler as AnyHandler,
         } satisfies NormalizedRouter;
       });
     }),
   ).then((routers) => routers.flat().sort((a, b) => a.priority - b.priority));
+
+  for (const router of routers) {
+    const method = router.method.toUpperCase().padEnd(6);
+    const path = router.path.padEnd(40);
+    const operationId = router.operationId.padEnd(20);
+    const description = router.description;
+    const message = `Operation: ${operationId} | ${method} | ${path} | ${description}`;
+    logger.info(message);
+  }
 
   return routers;
 }
