@@ -1,6 +1,6 @@
 import { User } from "./User";
 
-export class Auth {
-  accessToken!: string;
-  user!: User;
+export interface Auth {
+  accessToken: string;
+  user: User;
 }

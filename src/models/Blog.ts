@@ -1,15 +1,15 @@
 import { dateToUnixTime } from "utils/datetime";
 import { KeywordTags, RawKeywordTags, toKeywordTags } from "./KeywordTags";
 
-export class Blog {
-  id!: number;
-  name!: string;
-  url!: string;
-  rss!: string;
-  main!: boolean;
-  keywords!: KeywordTags[];
-  lastPublishedAt!: number | null;
-  createdAt!: number;
+export interface Blog {
+  id: number;
+  name: string;
+  url: string;
+  rss: string;
+  main: boolean;
+  keywords: KeywordTags[];
+  lastPublishedAt: number | null;
+  createdAt: number;
 }
 
 export interface RawBlog {

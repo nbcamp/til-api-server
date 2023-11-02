@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 
-export class KeywordTags {
-  keyword!: string;
-  tags!: string[];
+export interface KeywordTags {
+  keyword: string;
+  tags: string[];
 }
 
 export interface RawKeywordTags {

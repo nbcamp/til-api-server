@@ -1,13 +1,13 @@
 import { dateToUnixTime } from "utils/datetime";
 
-export class Post {
-  id!: number;
-  userId!: number;
-  title!: string;
-  content!: string;
-  url!: string;
-  tags!: string[];
-  publishedAt!: number;
+export interface Post {
+  id: number;
+  userId: number;
+  title: string;
+  content: string;
+  url: string;
+  tags: string[];
+  publishedAt: number;
 }
 
 export interface RawPost {

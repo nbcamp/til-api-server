@@ -1,4 +1,5 @@
 import { prisma } from "prisma";
+import { CursorBasedPagination } from "utils/pagination";
 
 export async function findById(id: number) {
   return prisma.user.findUnique({ where: { id } });
@@ -74,40 +75,38 @@ export function sync(id: number) {
   });
 }
 
-export async function findFollowers(input: {
-  userId: number;
-  cursor?: number;
-  limit?: number;
-  desc?: boolean;
-}) {
+export async function findFollowers(
+  pagination?: CursorBasedPagination,
+  where?: { userId: number },
+) {
+  const { cursor, limit, desc } = pagination ?? {};
   const followerMaps = await prisma.follow.findMany({
-    where: { followingId: input.userId },
+    where: { followingId: where?.userId },
     include: { follower: true },
-    ...(input.cursor && {
-      cursor: { id: input.cursor },
+    ...(cursor && {
+      cursor: { id: cursor },
       skip: 1,
     }),
-    take: input.limit ?? 100,
-    orderBy: { id: input.desc ? "desc" : "asc" },
+    take: limit ?? 100,
+    orderBy: { id: desc ? "desc" : "asc" },
   });
   return followerMaps.map(({ follower }) => follower);
 }
 
-export async function findFollowings(input: {
-  userId: number;
-  cursor?: number;
-  limit?: number;
-  desc?: boolean;
-}) {
+export async function findFollowings(
+  pagination?: CursorBasedPagination,
+  where?: { userId: number },
+) {
+  const { cursor, limit, desc } = pagination ?? {};
   const followingMaps = await prisma.follow.findMany({
-    where: { followerId: input.userId },
+    where: { followerId: where?.userId },
     include: { following: true },
-    ...(input.cursor && {
-      cursor: { id: input.cursor },
+    ...(cursor && {
+      cursor: { id: cursor },
       skip: 1,
     }),
-    take: input.limit ?? 100,
-    orderBy: { id: input.desc ? "desc" : "asc" },
+    take: limit ?? 100,
+    orderBy: { id: desc ? "desc" : "asc" },
   });
   return followingMaps.map(({ following }) => following);
 }

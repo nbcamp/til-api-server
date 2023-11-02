@@ -1,13 +1,21 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 
-export function findAllByUserId(userId: number) {
+/**
+ * @param userId 사용자 ID를 지정하면 해당 사용자의 블로그 목록을 조회합니다.
+ * @returns 블로그 목록
+ */
+export function findAll(where?: { userId?: number }) {
   return prisma.blog.findMany({
-    where: { userId },
+    where,
     include: { keywordTagMaps: true },
   });
 }
 
+/**
+ * @param userId 해당 사용자의 메인 블로그를 조회합니다.
+ * @returns 메인 블로그
+ */
 export function findMainByUserId(userId: number) {
   return prisma.blog.findFirst({
     where: { userId, main: true },
@@ -15,9 +23,14 @@ export function findMainByUserId(userId: number) {
   });
 }
 
-export function findById(input: { blogId: number; userId: number }) {
+/**
+ * @param blogId 블로그의 ID
+ * @param userId 사용자 ID를 지정하면 해당 사용자의 블로그를 조회합니다.
+ * @returns 블로그
+ */
+export function findById(blogId: number, where?: { userId?: number }) {
   return prisma.blog.findFirst({
-    where: { id: input.blogId, userId: input.userId },
+    where: { id: blogId, ...where },
     include: { keywordTagMaps: true },
   });
 }
@@ -112,10 +125,10 @@ export async function update(
   });
 }
 
-export async function remove(input: { blogId: number; userId: number }) {
-  const blog = await findById(input);
+export async function remove(blogId: number, userId?: number) {
+  const blog = await findById(blogId, { userId });
   if (blog?.main) {
     throw new HttpError("기본 블로그는 삭제할 수 없습니다.", "BAD_REQUEST");
   }
-  return prisma.blog.delete({ where: { id: input.blogId } });
+  return prisma.blog.delete({ where: { id: blogId } });
 }

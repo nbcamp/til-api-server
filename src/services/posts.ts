@@ -2,18 +2,14 @@ import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 import { unixTimeToDate } from "utils/datetime";
 import { isBefore } from "date-fns";
+import { CursorBasedPagination } from "utils/pagination";
 
-export function findAll(input: {
-  userId?: number;
-  cursor?: number;
-  limit?: number;
-  desc?: boolean;
-  q?: string;
-}) {
-  const q = input.q?.trim();
+export function findAll(pagination?: CursorBasedPagination, userId?: number) {
+  const q = pagination?.q?.trim();
+  const { cursor, limit, desc } = pagination ?? {};
   return prisma.post.findMany({
     where: {
-      userId: input.userId,
+      userId: userId,
       ...(q && {
         OR: [
           { title: { contains: q } },
@@ -23,18 +19,21 @@ export function findAll(input: {
       }),
     },
     include: { postTags: true },
-    ...(input.cursor && {
-      cursor: { id: input.cursor },
+    ...(cursor && {
+      cursor: { id: cursor },
       skip: 1,
     }),
-    take: input.limit ?? 100,
-    orderBy: { publishedAt: input.desc ? "desc" : "asc" },
+    take: limit ?? 100,
+    orderBy: { publishedAt: desc ? "desc" : "asc" },
   });
 }
 
-export function findOneById(input: { postId: number; userId: number }) {
+export function findById(
+  postId: number,
+  where?: { blogId?: number; userId?: number },
+) {
   return prisma.post.findFirst({
-    where: { id: input.postId, userId: input.userId },
+    where: { id: postId, ...where },
     include: { postTags: true },
   });
 }
