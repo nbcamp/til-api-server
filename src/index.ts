@@ -8,7 +8,6 @@ Bun.serve({
   port: PORT,
   development: true,
   async fetch(request) {
-    logger.info(`${request.url}`, { request });
     return handler(request);
   },
 });

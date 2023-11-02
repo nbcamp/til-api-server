@@ -24,10 +24,22 @@ const logger = winston.createLogger({
         label: "magenta",
         url: "yellow",
         ms: "dim",
+        id: "dim",
       },
     }),
     winston.format.printf(
-      ({ label, timestamp, level, message, request, error, ms, ...meta }) => {
+      ({
+        id: _id,
+        label,
+        timestamp,
+        level,
+        message,
+        request,
+        response,
+        error,
+        ms,
+        ...meta
+      }) => {
         function build(body: string, meta: string = "") {
           const header = `${colorize("timestamp", `${timestamp}`)}`;
           const name = label ? colorize("label", `${label} `) : "";
@@ -36,10 +48,18 @@ const logger = winston.createLogger({
         }
 
         if (request instanceof Request) {
+          const id = colorize("id", `[${_id}]`);
           const url = new URL(request.url);
           const method = colorize("method", request.method);
           const pathname = colorize("url", url.pathname);
-          return build(`${method} ${pathname}`);
+          return build(`${id} ${method} ${pathname}`);
+        }
+
+        if (response instanceof Response) {
+          const id = colorize("id", `[${_id}]`);
+          const status = response.status;
+          const statusText = response.statusText;
+          return build(`${id} ${status} ${statusText}`);
         }
 
         if (error instanceof Error) {

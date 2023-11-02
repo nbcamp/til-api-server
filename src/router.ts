@@ -190,10 +190,13 @@ async function makeFileSystemBasedRouterMap(
 
 const routers = await makeFileSystemBasedRouterMap("controllers");
 
-export default async (request: Request): Promise<Response> => {
-  const url = new URL(request.url);
+let id = 0;
+
+export default async (req: Request): Promise<Response> => {
+  const requestId = ++id;
+  const url = new URL(req.url);
   for (const router of routers) {
-    if (router.method !== request.method) continue;
+    if (router.method !== req.method) continue;
 
     const matches = router.route.exec(url.pathname);
     if (!matches) continue;
@@ -203,14 +206,17 @@ export default async (request: Request): Promise<Response> => {
     );
 
     try {
-      const body = await tryCatch(() => request.json());
+      logger.info("REQ", { request: req, id: requestId });
+      const body = await tryCatch(() => req.json());
       const result = await router.handler({
         param,
         query: Object.fromEntries(url.searchParams.entries()),
         body: body || {},
-        request,
+        request: req,
       });
-      return response(result, "OK");
+      const res = response(result, "OK");
+      logger.info("RES", { response: res, id: requestId });
+      return res;
     } catch (error) {
       if (error instanceof HttpError) {
         logger.error(`${error.message} (${error.code}, ${error.status})`, {
