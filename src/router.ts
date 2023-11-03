@@ -2,8 +2,10 @@ import glob from "fast-glob";
 import { pathToRegexp, Key } from "path-to-regexp";
 import path from "node:path";
 
-import logger from "utils/logger";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { User } from "@prisma/client";
+
+import logger from "utils/logger";
 import { tryCatch } from "utils/tryCatch";
 import { HttpError, HttpMethod, response } from "utils/http";
 import { InferType, TypeDescriptor, validate } from "utils/validator";
@@ -178,7 +180,7 @@ async function makeFileSystemBasedRouterMap(
 
   for (const router of routers) {
     const method = router.method.toUpperCase().padEnd(6);
-    const path = router.path.padEnd(40);
+    const path = router.path.padEnd(50);
     const operationId = router.operationId.padEnd(20);
     const description = router.description;
     const message = `Operation: ${operationId} | ${method} | ${path} | ${description}`;
@@ -218,12 +220,23 @@ export default async (req: Request): Promise<Response> => {
       logger.info("RES", { response: res, id: requestId });
       return res;
     } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        logger.error(`${error.message} (${error.code})`, {
+          error: error.cause ?? error,
+        });
+        return response(
+          { error: "예상치 못한 오류가 발생했습니다." },
+          "BAD_REQUEST",
+        );
+      }
+
       if (error instanceof HttpError) {
         logger.error(`${error.message} (${error.code}, ${error.status})`, {
           error: error.cause ?? error,
         });
         return response({ error: error.message }, error.status);
       }
+
       logger.error("Internal Server Error", { error });
       return response(
         { error: "Internal Server Error" },

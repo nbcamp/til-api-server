@@ -4,12 +4,17 @@ import { unixTimeToDate } from "utils/datetime";
 import { isBefore } from "date-fns";
 import { CursorBasedPagination } from "utils/pagination";
 
-export function findAll(pagination?: CursorBasedPagination, userId?: number) {
+export function findAll(
+  pagination?: CursorBasedPagination,
+  where?: { blogId?: number; userId?: number },
+) {
   const q = pagination?.q?.trim();
   const { cursor, limit, desc } = pagination ?? {};
+  const { blogId, userId } = where ?? {};
   return prisma.post.findMany({
     where: {
-      userId: userId,
+      userId,
+      blogId,
       ...(q && {
         OR: [
           { title: { contains: q } },
@@ -46,20 +51,20 @@ export async function create(input: {
   url: string;
   publishedAt: number;
 }) {
-  const blog = await prisma.blog.findUnique({ where: { id: input.blogId } });
-
+  const { userId, blogId } = input;
+  const blog = await prisma.blog.findUnique({ where: { id: blogId, userId } });
   if (!blog) {
     throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
   }
 
   if (!input.url.includes(blog.url)) {
     throw new HttpError(
-      "해당 TIL의 URL은 소유하지 않은 블로그의 주소입니다.",
+      "해당 게시글의 URL은 소유하지 않은 블로그의 주소입니다.",
       "BAD_REQUEST",
     );
   }
 
-  if (await prisma.post.findFirst({ where: { url: input.url } })) {
+  if (await prisma.post.findFirst({ where: { url: input.url, userId } })) {
     throw new HttpError("이미 등록한 URL입니다.", "BAD_REQUEST");
   }
 
@@ -67,13 +72,13 @@ export async function create(input: {
     const publishedAt = unixTimeToDate(input.publishedAt);
     if (!blog.lastPublishedAt || isBefore(blog.lastPublishedAt, publishedAt)) {
       await tx.blog.update({
-        where: { id: input.blogId },
+        where: { id: blogId, userId },
         data: { lastPublishedAt: publishedAt },
       });
     }
 
     const keywordMaps = await tx.keywordTagMap.findMany({
-      where: { blogId: input.blogId },
+      where: { blogId: blogId },
     });
 
     const matched = keywordMaps.find(({ keyword }) =>
@@ -86,8 +91,8 @@ export async function create(input: {
 
     return tx.post.create({
       data: {
-        blogId: input.blogId,
-        userId: input.userId,
+        blogId,
+        userId,
         title: input.title,
         content: input.content,
         url: input.url,
@@ -114,7 +119,7 @@ export async function update(
   });
 
   if (!post) {
-    throw new HttpError("Not found", "NOT_FOUND");
+    throw new HttpError("게시글을 찾을 수 없습니다.", "NOT_FOUND");
   }
 
   if (await prisma.post.findFirst({ where: { url: input.url } })) {

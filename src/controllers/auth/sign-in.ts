@@ -27,7 +27,7 @@ export const signIn = createRouter({
 
     return {
       accessToken: jwt.sign({ id: user.id }),
-      user: await users.withMetrics(toUser(user)),
+      user: toUser(await users.withMetrics(user)),
     };
   },
 });

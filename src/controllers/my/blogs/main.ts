@@ -9,7 +9,9 @@ export const getMyMainBlog = createRouter({
   authorized: true,
   async handler(ctx): Promise<Blog> {
     const blog = await blogs.findMainByUserId(ctx.auth.user.id);
-    if (!blog) throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
+    if (!blog) {
+      throw new HttpError("메인 블로그를 찾을 수 없습니다.", "NOT_FOUND");
+    }
     return toBlog(blog);
   },
 });

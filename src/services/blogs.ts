@@ -74,20 +74,28 @@ export async function create(input: {
 }
 
 export async function update(
-  id: number,
   input: {
     name?: string;
-    userId: number;
     main?: boolean;
     keywords?: {
       keyword: string;
       tags: string[];
     }[];
   },
+  where?: {
+    blogId?: number;
+    userId?: number;
+  },
 ) {
+  const { blogId: id, userId } = where ?? {};
+  const blog = await prisma.blog.findFirst({ where: { id, userId } });
+  if (!blog) {
+    throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
+  }
+
   if (input.name) {
     const blog = await prisma.blog.findFirst({
-      where: { userId: input.userId, name: input.name, NOT: { id } },
+      where: { userId, name: input.name, NOT: { id } },
     });
     if (blog) {
       throw new HttpError(
@@ -96,15 +104,11 @@ export async function update(
       );
     }
   }
-  const blog = await prisma.blog.findFirst({ where: { id } });
-  if (!blog) {
-    throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
-  }
 
   return prisma.$transaction(async (tx) => {
     if (input.main) {
       await tx.blog.updateMany({
-        where: { userId: input.userId },
+        where: { userId },
         data: { main: false },
       });
     }

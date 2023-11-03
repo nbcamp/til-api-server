@@ -7,10 +7,15 @@ export const setMyMainBlog = createRouter({
   method: "PATCH",
   authorized: true,
   async handler(ctx): Promise<Blog> {
-    const blog = await blogs.update(+ctx.param.id, {
-      userId: ctx.auth.user.id,
-      main: true,
-    });
+    const blog = await blogs.update(
+      {
+        main: true,
+      },
+      {
+        blogId: +ctx.param.blogId,
+        userId: ctx.auth.user.id,
+      },
+    );
     return toBlog(blog);
   },
 });

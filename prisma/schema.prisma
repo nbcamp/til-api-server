@@ -17,15 +17,16 @@ model User {
   avatarUrl    String?   @map("avatar_url") @db.Text()
   provider     String?   @map("provider") @db.VarChar(10)
   providerId   String?   @map("provider_id") @db.VarChar(100)
-  createdAt    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
-  lastSignedAt DateTime? @map("last_signed_at") @db.Timestamp()
-  deletedAt    DateTime? @map("deleted_at") @db.Timestamp()
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  lastSignedAt DateTime? @map("last_signed_at") @db.Timestamp(0)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamp(0)
 
   blogs      Blog[]
   posts      Post[]
-  followers  Follow[] @relation("follower")
-  followings Follow[] @relation("following")
+  followers  Follow[]   @relation("follower")
+  followings Follow[]   @relation("following")
+  postlikes  PostLike[]
 
   @@unique([provider, providerId], name: "providerIndex")
   @@map("users")
@@ -35,7 +36,7 @@ model Follow {
   id          Int      @id @default(autoincrement())
   followerId  Int      @map("follower_id")
   followingId Int      @map("following_id")
-  createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
 
   follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
@@ -47,13 +48,13 @@ model Follow {
 model Blog {
   id              Int       @id @default(autoincrement())
   userId          Int       @map("user_id")
-  name            String    @db.VarChar(20)
+  name            String    @db.VarChar(30)
   url             String    @db.Text()
   rss             String    @db.Text()
   main            Boolean   @default(false)
-  lastPublishedAt DateTime? @map("last_published_at") @db.Timestamp()
-  createdAt       DateTime  @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt       DateTime  @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
+  lastPublishedAt DateTime? @map("last_published_at") @db.Timestamp(0)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts          Post[]
@@ -71,13 +72,14 @@ model Post {
   title       String   @db.VarChar(50)
   content     String   @db.VarChar(100)
   url         String   @unique @db.VarChar(512)
-  publishedAt DateTime @map("published_at") @db.Timestamp()
-  createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP()")) @map("created_at") @db.Timestamp()
-  updatedAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()")) @map("updated_at") @db.Timestamp()
+  publishedAt DateTime @map("published_at") @db.Timestamp(0)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
 
-  blog     Blog      @relation(fields: [blogId], references: [id], onDelete: Cascade)
-  user     User      @relation(fields: [userId], references: [id])
-  postTags PostTag[]
+  blog      Blog       @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id])
+  postTags  PostTag[]
+  postLikes PostLike[]
 
   @@unique([id, blogId], name: "postBlogIdIndex")
   @@unique([id, userId], name: "postUserIdIndex")
@@ -108,11 +110,14 @@ model KeywordTagMap {
   @@map("keyword_tag_maps")
 }
 
-// model Tag {
-//   id   Int    @id @default(autoincrement())
-//   name String
+model PostLike {
+  id     Int @id @default(autoincrement())
+  postId Int @map("post_id")
+  userId Int @map("user_id")
 
-//   postTags PostTag[]
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-//   @@map("tags")
-// }
+  @@unique([postId, userId], name: "postLikeIndex")
+  @@map("post_likes")
+}
