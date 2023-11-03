@@ -63,3 +63,10 @@
 |x| GET | /users/:userId/likes/posts | 사용자의 좋아요한 포스트 목록을 불러옵니다. |
 || GET | /users/:userId/followers | 사용자의 팔로워 목록을 불러옵니다. |
 || GET | /users/:userId/followings | 사용자의 팔로잉 목록을 불러옵니다. |
+
+### Community
+
+| | Method | Path | Description |
+|-|:---|:---|:---|
+|x| GET | /community/posts | 커뮤니티의 포스트 목록을 불러옵니다. |
+|x| GET | /community/posts/:postId | 커뮤니티의 포스트를 불러옵니다. |

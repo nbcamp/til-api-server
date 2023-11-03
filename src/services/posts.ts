@@ -7,6 +7,7 @@ import { CursorBasedPagination } from "utils/pagination";
 export function findAll(
   pagination?: CursorBasedPagination,
   where?: { blogId?: number; userId?: number },
+  include?: { user?: boolean },
 ) {
   const q = pagination?.q?.trim();
   const { cursor, limit, desc } = pagination ?? {};
@@ -23,7 +24,12 @@ export function findAll(
         ],
       }),
     },
-    include: { postTags: true },
+    include: {
+      postTags: true,
+      ...(include?.user && {
+        user: true,
+      }),
+    },
     ...(cursor && {
       cursor: { id: cursor },
       skip: 1,
