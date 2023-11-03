@@ -5,7 +5,7 @@ import { Blog, toBlog } from "models";
 export const getMyBlogs = createRouter({
   description: "내 블로그 목록을 가져옵니다.",
   authorized: true,
-  async handler(ctx) {
+  async handler(ctx): Promise<Blog[]> {
     const list = await blogs.findAll({ userId: ctx.auth.user.id });
     return list.map(toBlog);
   },

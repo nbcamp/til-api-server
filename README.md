@@ -51,3 +51,15 @@
 |x| POST | /my/followings/:userId | 다른 사용자를 팔로잉합니다. |
 |x| DELETE | /my/followings/:userId | 다른 사용자를 언팔로잉합니다. |
 |x| DELETE | /my/followers/:userId | 나의 팔로워를 삭제합니다. |
+
+### Users
+
+| | Method | Path | Description |
+|-|:---|:---|:---|
+|x| GET | /users/:userId | 사용자 정보를 불러옵니다. |
+|x| GET | /users/:userId/blogs | 사용자의 블로그 목록을 불러옵니다. |
+|x| GET | /users/:userId/blogs/main | 사용자의 메인 블로그를 불러옵니다. |
+|x| GET | /users/:userId/posts | 사용자의 포스트 목록을 불러옵니다. |
+|x| GET | /users/:userId/likes/posts | 사용자의 좋아요한 포스트 목록을 불러옵니다. |
+|| GET | /users/:userId/followers | 사용자의 팔로워 목록을 불러옵니다. |
+|| GET | /users/:userId/followings | 사용자의 팔로잉 목록을 불러옵니다. |

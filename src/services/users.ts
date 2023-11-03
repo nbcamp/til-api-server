@@ -1,8 +1,19 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { prisma } from "prisma";
+import { HttpError } from "utils/http";
 import { CursorBasedPagination } from "utils/pagination";
 
 export async function findById(id: number) {
-  return prisma.user.findUnique({ where: { id } });
+  try {
+    return await prisma.user.findUniqueOrThrow({ where: { id } });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        throw new HttpError("해당 사용자를 찾을 수 없습니다.", "NOT_FOUND");
+      }
+    }
+    throw error;
+  }
 }
 
 export async function findByIds(ids: number[]) {

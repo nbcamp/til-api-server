@@ -1,5 +1,6 @@
 import { HttpError } from "utils/http";
 import { prisma } from "prisma";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 /**
  * @param userId 사용자 ID를 지정하면 해당 사용자의 블로그 목록을 조회합니다.
@@ -16,11 +17,20 @@ export function findAll(where?: { userId?: number }) {
  * @param userId 해당 사용자의 메인 블로그를 조회합니다.
  * @returns 메인 블로그
  */
-export function findMainByUserId(userId: number) {
-  return prisma.blog.findFirst({
-    where: { userId, main: true },
-    include: { keywordTagMaps: true },
-  });
+export async function findMainByUserId(userId: number) {
+  try {
+    return await prisma.blog.findFirstOrThrow({
+      where: { userId, main: true },
+      include: { keywordTagMaps: true },
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        throw new HttpError("메인 블로그를 찾을 수 없습니다.", "NOT_FOUND");
+      }
+    }
+    throw error;
+  }
 }
 
 /**

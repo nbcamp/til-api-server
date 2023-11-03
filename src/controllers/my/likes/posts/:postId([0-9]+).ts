@@ -2,7 +2,7 @@ import { createRouter } from "router";
 import { likes } from "services";
 
 export const likePost = createRouter({
-  description: "포스트에 좋아요를 합니다.",
+  description: "게시글에 좋아요를 합니다.",
   method: "POST",
   authorized: true,
   async handler(ctx): Promise<boolean> {
@@ -15,7 +15,7 @@ export const likePost = createRouter({
 });
 
 export const unlikePost = createRouter({
-  description: "포스트에 좋아요를 취소합니다.",
+  description: "게시글에 좋아요를 취소합니다.",
   method: "DELETE",
   authorized: true,
   async handler(ctx): Promise<boolean> {
