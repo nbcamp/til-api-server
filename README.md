@@ -20,6 +20,7 @@
 |-|:---|:---|:---|
 |x| GET | /my/blogs | 나의 블로그 목록을 불러옵니다. |
 |x| GET | /my/blogs/:blogId | 나의 블로그를 불러옵니다. |
+|x| GET | /my/blogs/main | 나의 메인 블로그를 불러옵니다. |
 |x| POST | /my/blogs | 나의 블로그를 생성합니다. |
 |x| PATCH | /my/blogs/:blogId | 나의 블로그를 수정합니다. |
 |x| DELETE | /my/blogs/:blogId | 나의 블로그를 삭제합니다. |
@@ -27,15 +28,15 @@
 | | Method | Path | Description |
 |-|:---|:---|:---|
 |x| GET | /my/blogs/:blogId/posts | 나의 게시글 목록을 불러옵니다. |
-|x| GET | /my/blogs/:blogId/posts/:postId | 나의 게시글를 불러옵니다. |
-|x| POST | /my/blogs/:blogId/posts | 나의 게시글를 생성합니다. |
-|x| PATCH | /my/blogs/:blogId/posts/:postId | 나의 게시글를 수정합니다. |
-|x| DELETE | /my/blogs/:blogId/posts/:postId | 나의 게시글를 삭제합니다. |
+|x| GET | /my/blogs/:blogId/posts/:postId | 나의 게시글을 불러옵니다. |
+|x| POST | /my/blogs/:blogId/posts | 나의 게시글을 생성합니다. |
+|x| PATCH | /my/blogs/:blogId/posts/:postId | 나의 게시글을 수정합니다. |
+|x| DELETE | /my/blogs/:blogId/posts/:postId | 나의 게시글을 삭제합니다. |
 
 | | Method | Path | Description |
 |-|:---|:---|:---|
 |x| GET | /my/posts | 나의 게시글 목록을 불러옵니다. |
-|x| GET | /my/posts/:postId | 나의 게시글를 불러옵니다. |
+|x| GET | /my/posts/:postId | 나의 게시글을 불러옵니다. |
 
 | | Method | Path | Description |
 |-|:---|:---|:---|
@@ -47,7 +48,6 @@
 |-|:---|:---|:---|
 |x| GET | /my/followers | 나의 팔로워 목록을 불러옵니다. |
 |x| GET | /my/followings | 나의 팔로잉 목록을 불러옵니다. |
-|x| GET | /my/followers/:userId | 나의 팔로워를 불러옵니다. |
 |x| POST | /my/followings/:userId | 다른 사용자를 팔로잉합니다. |
 |x| DELETE | /my/followings/:userId | 다른 사용자를 언팔로잉합니다. |
 |x| DELETE | /my/followers/:userId | 나의 팔로워를 삭제합니다. |

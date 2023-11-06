@@ -24,6 +24,7 @@ export const updateMyBlog = createRouter({
   authorized: true,
   descriptor: {
     name: optional("string"),
+    main: "boolean",
     keywords: optional([
       {
         keyword: "string",
@@ -35,6 +36,7 @@ export const updateMyBlog = createRouter({
     const blog = await blogs.update(
       {
         name: ctx.body.name,
+        main: ctx.body.main,
         keywords: ctx.body.keywords,
       },
       {
