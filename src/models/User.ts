@@ -1,3 +1,5 @@
+import { dateToUnixTime } from "utils/datetime";
+
 export interface User {
   id: number;
   username: string | null;
@@ -5,6 +7,7 @@ export interface User {
   posts: number;
   followers: number;
   followings: number;
+  lastPublishedAt: number | null;
 }
 
 export interface RawUser {
@@ -14,6 +17,7 @@ export interface RawUser {
   posts: number;
   followers: number;
   followings: number;
+  lastPublishedAt: Date | null;
 }
 
 export function toUser(raw: RawUser): User {
@@ -24,5 +28,6 @@ export function toUser(raw: RawUser): User {
     posts: raw.posts,
     followers: raw.followers,
     followings: raw.followings,
+    lastPublishedAt: dateToUnixTime(raw.lastPublishedAt),
   };
 }

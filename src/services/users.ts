@@ -31,16 +31,25 @@ export async function findByProvider(provider: string, providerId: string) {
   });
 }
 
-export function withMetrics<User extends { id: number }>(user: User) {
-  return prisma.$transaction(async (tx) => {
-    const [posts, followers, followings] = await Promise.all([
-      tx.post.count({ where: { userId: user.id } }),
-      tx.follow.count({ where: { followingId: user.id } }),
-      tx.follow.count({ where: { followerId: user.id } }),
-    ]);
+export async function withMetrics<User extends { id: number }>(user: User) {
+  const [posts, followers, followings, blog] = await Promise.all([
+    prisma.post.count({ where: { userId: user.id } }),
+    prisma.follow.count({ where: { followingId: user.id } }),
+    prisma.follow.count({ where: { followerId: user.id } }),
+    prisma.blog.findFirst({
+      where: { userId: user.id },
+      select: { lastPublishedAt: true },
+      orderBy: { lastPublishedAt: "desc" },
+    }),
+  ]);
 
-    return { ...user, posts, followers, followings };
-  });
+  return {
+    ...user,
+    posts,
+    followers,
+    followings,
+    lastPublishedAt: blog?.lastPublishedAt ?? null,
+  };
 }
 
 export function create(input: {
