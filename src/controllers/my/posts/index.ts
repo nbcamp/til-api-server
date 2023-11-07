@@ -8,7 +8,9 @@ export const getMyPosts = createRouter({
   authorized: true,
   async handler(ctx): Promise<Post[]> {
     const options = normalizePaginationQuery(ctx.query);
-    const list = await posts.findAll(options, { userId: ctx.auth.user.id });
+    const list = await posts.findAll(options, {
+      userId: ctx.auth.user.id,
+    });
     return list.map(toPost);
   },
 });

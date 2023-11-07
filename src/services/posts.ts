@@ -4,7 +4,7 @@ import { unixTimeToDate } from "utils/datetime";
 import { isBefore } from "date-fns";
 import { CursorBasedPagination } from "utils/pagination";
 
-export function findAll(
+export async function findAll(
   pagination?: CursorBasedPagination,
   where?: { blogId?: number; userId?: number },
   include?: { user?: boolean },
@@ -12,7 +12,7 @@ export function findAll(
   const q = pagination?.q?.trim();
   const { cursor, limit, desc } = pagination ?? {};
   const { blogId, userId } = where ?? {};
-  return prisma.post.findMany({
+  const list = await prisma.post.findMany({
     where: {
       userId,
       blogId,
@@ -29,6 +29,10 @@ export function findAll(
       ...(include?.user && {
         user: true,
       }),
+      postLikes: {
+        where: { userId },
+        take: 1,
+      },
     },
     ...(cursor && {
       cursor: { id: cursor },
@@ -37,6 +41,11 @@ export function findAll(
     take: limit ?? 100,
     orderBy: { publishedAt: desc ? "desc" : "asc" },
   });
+
+  return list.map((post) => ({
+    ...post,
+    liked: post.postLikes.length > 0,
+  }));
 }
 
 export function findById(

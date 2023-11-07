@@ -3,15 +3,14 @@ import { likes } from "services";
 import { Post, toPost } from "models";
 import { normalizePaginationQuery } from "utils/pagination";
 
-export const getUserPostLikes = createRouter({
-  description: "사용자가 좋아요한 게시글을 조회합니다.",
-  method: "GET",
+export const getMyLikedPosts = createRouter({
+  description: "내가 좋아요한 게시글 목록을 불러옵니다.",
   authorized: true,
   async handler(ctx): Promise<Post[]> {
     const options = normalizePaginationQuery(ctx.query);
     const list = await likes.findAllPosts(options, {
-      userId: +ctx.param.userId,
+      userId: ctx.auth.user.id,
     });
-    return list.map(({ post }) => toPost(post));
+    return list.map(({ post }) => toPost({ ...post, liked: true }));
   },
 });

@@ -40,9 +40,7 @@
 
 | | Method | Path | Description |
 |-|:---|:---|:---|
-|x| GET | /my/likes/posts | 나의 좋아요한 게시글 목록을 불러옵니다. |
-|x| POST | /my/likes/posts/:postId | 게시글에 좋아요를 누릅니다. |
-|x| DELETE | /my/likes/posts/:postId | 게시글에 좋아요를 취소합니다. |
+|x| GET | /my/liked-posts | 나의 좋아요한 게시글 목록을 불러옵니다. |
 
 | | Method | Path | Description |
 |-|:---|:---|:---|
@@ -59,8 +57,8 @@
 |x| GET | /users/:userId | 사용자 정보를 불러옵니다. |
 |x| GET | /users/:userId/blogs | 사용자의 블로그 목록을 불러옵니다. |
 |x| GET | /users/:userId/blogs/main | 사용자의 메인 블로그를 불러옵니다. |
-|x| GET | /users/:userId/posts | 사용자의 포스트 목록을 불러옵니다. |
-|x| GET | /users/:userId/likes/posts | 사용자의 좋아요한 포스트 목록을 불러옵니다. |
+|x| GET | /users/:userId/posts | 사용자의 게시글 목록을 불러옵니다. |
+|x| GET | /users/:userId/liked-posts | 사용자의 좋아요한 게시글 목록을 불러옵니다. |
 || GET | /users/:userId/followers | 사용자의 팔로워 목록을 불러옵니다. |
 || GET | /users/:userId/followings | 사용자의 팔로잉 목록을 불러옵니다. |
 
@@ -68,5 +66,7 @@
 
 | | Method | Path | Description |
 |-|:---|:---|:---|
-|x| GET | /community/posts | 커뮤니티의 포스트 목록을 불러옵니다. |
-|x| GET | /community/posts/:postId | 커뮤니티의 포스트를 불러옵니다. |
+|x| GET | /community/posts | 커뮤니티의 게시글 목록을 불러옵니다. |
+|x| GET | /community/posts/:postId | 커뮤니티의 게시글을 불러옵니다. |
+|x| POST | /community/posts/:postId/likes | 커뮤니티의 게시글을 좋아요합니다. |
+|x| DELETE | /community/posts/:postId/likes | 커뮤니티의 게시글을 좋아요를 취소합니다. |

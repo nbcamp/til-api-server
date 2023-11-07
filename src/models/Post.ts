@@ -8,6 +8,7 @@ export interface Post {
   content: string;
   url: string;
   tags: string[];
+  liked?: boolean;
   publishedAt: number;
 }
 
@@ -19,6 +20,7 @@ export interface RawPost {
   content: string;
   url: string;
   postTags: { tag: string }[];
+  liked?: boolean;
   publishedAt: Date;
 }
 
@@ -31,6 +33,7 @@ export function toPost(raw: RawPost): Post {
     content: raw.content,
     url: raw.url,
     tags: raw.postTags.map(({ tag }) => tag),
+    liked: raw.liked,
     publishedAt: dateToUnixTime(raw.publishedAt),
   };
 }
