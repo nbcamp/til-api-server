@@ -24,8 +24,8 @@ model User {
 
   blogs      Blog[]
   posts      Post[]
-  followers  Follow[]   @relation("follower")
-  followings Follow[]   @relation("following")
+  followers  Follow[]   @relation("following")
+  followings Follow[]   @relation("follower")
   postlikes  PostLike[]
 
   @@unique([provider, providerId], name: "providerIndex")
