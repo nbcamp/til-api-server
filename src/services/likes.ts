@@ -6,6 +6,7 @@ import { CursorBasedPagination } from "utils/pagination";
 export function findAllPosts(
   pagination?: CursorBasedPagination,
   where?: { userId?: number },
+  include?: { user?: boolean },
 ) {
   const { cursor, limit, desc } = pagination ?? {};
   const { userId } = where ?? {};
@@ -15,6 +16,7 @@ export function findAllPosts(
       post: {
         include: {
           postTags: true,
+          user: include?.user,
         },
       },
     },

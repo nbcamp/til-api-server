@@ -1,6 +1,6 @@
-import { Post, User, toPost, toUser } from "models";
 import { createRouter } from "router";
 import { posts, users } from "services";
+import { Post, User, toPost, toUser } from "models";
 import { normalizePaginationQuery } from "utils/pagination";
 
 interface CommunityPost extends Exclude<Post, "userId"> {
