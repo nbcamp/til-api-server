@@ -8,7 +8,7 @@ export interface Post {
   content: string;
   url: string;
   tags: string[];
-  liked?: boolean;
+  liked: boolean;
   publishedAt: number;
 }
 
@@ -20,7 +20,7 @@ export interface RawPost {
   content: string;
   url: string;
   postTags: { tag: string }[];
-  liked?: boolean;
+  liked: boolean;
   publishedAt: Date;
 }
 

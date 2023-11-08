@@ -17,9 +17,10 @@ export const getUserLikedPosts = createRouter({
       { user: true },
     );
     return Promise.all(
-      list.map(({ post }) =>
-        toCommunityPost(post as unknown as RawCommunityPost),
-      ),
+      list.map(({ post }) => ({
+        ...toCommunityPost(post as unknown as RawCommunityPost),
+        liked: true,
+      })),
     );
   },
 });
