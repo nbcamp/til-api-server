@@ -3,6 +3,7 @@ import { prisma } from "prisma";
 import { unixTimeToDate } from "utils/datetime";
 import { isBefore } from "date-fns";
 import { CursorBasedPagination } from "utils/pagination";
+import { userInclude } from "./users";
 
 export async function findAll(
   pagination?: CursorBasedPagination,
@@ -27,7 +28,9 @@ export async function findAll(
     include: {
       postTags: true,
       ...(include?.user && {
-        user: true,
+        user: {
+          include: userInclude,
+        },
       }),
       postLikes: {
         where: { userId },

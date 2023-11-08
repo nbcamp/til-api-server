@@ -9,8 +9,6 @@ export const getMyFollowings = createRouter({
   async handler(ctx): Promise<User[]> {
     const options = normalizePaginationQuery(ctx.query);
     const list = await users.findFollowings(options);
-    return Promise.all(
-      list.map(async (user) => toUser(await users.withMetrics(user))),
-    );
+    return Promise.all(list.map(async (user) => toUser(user)));
   },
 });

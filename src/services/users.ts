@@ -1,11 +1,34 @@
+import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { prisma } from "prisma";
 import { HttpError } from "utils/http";
 import { CursorBasedPagination } from "utils/pagination";
 
+export const userInclude: Prisma.UserInclude = {
+  _count: {
+    select: {
+      posts: true,
+      followers: true,
+      followings: true,
+    },
+  },
+  blogs: {
+    select: {
+      lastPublishedAt: true,
+    },
+    orderBy: {
+      lastPublishedAt: "desc",
+    },
+    take: 1,
+  },
+};
+
 export async function findById(id: number) {
   try {
-    return await prisma.user.findUniqueOrThrow({ where: { id } });
+    return await prisma.user.findUniqueOrThrow({
+      where: { id },
+      include: userInclude,
+    });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2025") {
@@ -28,28 +51,8 @@ export async function findByProvider(provider: string, providerId: string) {
         providerId,
       },
     },
+    include: userInclude,
   });
-}
-
-export async function withMetrics<User extends { id: number }>(user: User) {
-  const [posts, followers, followings, blog] = await Promise.all([
-    prisma.post.count({ where: { userId: user.id } }),
-    prisma.follow.count({ where: { followingId: user.id } }),
-    prisma.follow.count({ where: { followerId: user.id } }),
-    prisma.blog.findFirst({
-      where: { userId: user.id },
-      select: { lastPublishedAt: true },
-      orderBy: { lastPublishedAt: "desc" },
-    }),
-  ]);
-
-  return {
-    ...user,
-    posts,
-    followers,
-    followings,
-    lastPublishedAt: blog?.lastPublishedAt ?? null,
-  };
 }
 
 export function create(input: {
@@ -60,6 +63,7 @@ export function create(input: {
 }) {
   return prisma.user.create({
     data: { ...input },
+    include: userInclude,
   });
 }
 
@@ -70,13 +74,18 @@ export function update(
     avatarUrl?: string | null;
   },
 ) {
-  return prisma.user.update({ where: { id }, data: input });
+  return prisma.user.update({
+    where: { id },
+    data: input,
+    include: userInclude,
+  });
 }
 
 export async function remove(id: number) {
   return prisma.user.update({
     where: { id },
     data: {
+      providerId: null,
       deletedAt: new Date(),
       blogs: {
         deleteMany: {},
@@ -92,6 +101,7 @@ export function sync(id: number) {
       lastSignedAt: new Date(),
       deletedAt: null,
     },
+    include: userInclude,
   });
 }
 
@@ -102,7 +112,11 @@ export async function findFollowers(
   const { cursor, limit, desc } = pagination ?? {};
   const followerMaps = await prisma.follow.findMany({
     where: { followingId: where?.userId },
-    include: { follower: true },
+    include: {
+      follower: {
+        include: userInclude,
+      },
+    },
     ...(cursor && {
       cursor: { id: cursor },
       skip: 1,
@@ -120,7 +134,11 @@ export async function findFollowings(
   const { cursor, limit, desc } = pagination ?? {};
   const followingMaps = await prisma.follow.findMany({
     where: { followerId: where?.userId },
-    include: { following: true },
+    include: {
+      following: {
+        include: userInclude,
+      },
+    },
     ...(cursor && {
       cursor: { id: cursor },
       skip: 1,

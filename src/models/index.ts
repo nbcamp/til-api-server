@@ -11,3 +11,6 @@ export { toPost } from "./Post";
 
 export type { KeywordTags, RawKeywordTags } from "./KeywordTags";
 export { toKeywordTags } from "./KeywordTags";
+
+export type { CommunityPost, RawCommunityPost } from "./CommunityPost";
+export { toCommunityPost } from "./CommunityPost";

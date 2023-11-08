@@ -11,8 +11,6 @@ export const getMyFollowers = createRouter({
     const list = await users.findFollowers(options, {
       userId: ctx.auth.user.id,
     });
-    return Promise.all(
-      list.map(async (user) => toUser(await users.withMetrics(user))),
-    );
+    return Promise.all(list.map(async (user) => toUser(user)));
   },
 });

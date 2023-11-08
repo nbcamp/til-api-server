@@ -1,11 +1,7 @@
 import { createRouter } from "router";
-import { posts, users } from "services";
-import { Post, User, toPost, toUser } from "models";
+import { posts } from "services";
+import { CommunityPost, RawCommunityPost, toCommunityPost } from "models";
 import { normalizePaginationQuery } from "utils/pagination";
-
-interface CommunityPost extends Exclude<Post, "userId"> {
-  user: User;
-}
 
 export const getCommunityPosts = createRouter({
   description: "커뮤니티 게시글 목록을 가져옵니다.",
@@ -14,10 +10,9 @@ export const getCommunityPosts = createRouter({
     const options = normalizePaginationQuery(ctx.query);
     const postList = await posts.findAll(options, {}, { user: true });
     return Promise.all(
-      postList.map(async (post) => ({
-        ...toPost(post),
-        user: toUser(await users.withMetrics(post.user)),
-      })),
+      postList.map((post) =>
+        toCommunityPost(post as unknown as RawCommunityPost),
+      ),
     );
   },
 });

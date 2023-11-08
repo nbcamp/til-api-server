@@ -7,6 +7,6 @@ export const getUserProfile = createRouter({
   authorized: true,
   async handler(ctx): Promise<User> {
     const user = await users.findById(+ctx.param.userId);
-    return toUser(await users.withMetrics(user));
+    return toUser(user);
   },
 });

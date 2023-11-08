@@ -2,6 +2,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { prisma } from "prisma";
 import { HttpError } from "utils/http";
 import { CursorBasedPagination } from "utils/pagination";
+import { userInclude } from "./users";
 
 export function findAllPosts(
   pagination?: CursorBasedPagination,
@@ -12,11 +13,15 @@ export function findAllPosts(
   const { userId } = where ?? {};
   return prisma.postLike.findMany({
     where: { userId },
-    include: {
+    select: {
       post: {
         include: {
           postTags: true,
-          user: include?.user,
+          ...(include?.user && {
+            user: {
+              include: userInclude,
+            },
+          }),
         },
       },
     },

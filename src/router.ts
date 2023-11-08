@@ -3,7 +3,6 @@ import { pathToRegexp, Key } from "path-to-regexp";
 import path from "node:path";
 
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { User } from "@prisma/client";
 
 import logger from "utils/logger";
 import { tryCatch } from "utils/tryCatch";
@@ -11,6 +10,7 @@ import { HttpError, HttpMethod, response } from "utils/http";
 import { InferType, TypeDescriptor, validate } from "utils/validator";
 
 import { jwt, users } from "services";
+import { User, toUser } from "models";
 
 interface Body {
   [key: string]: any;
@@ -100,7 +100,10 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
               "UNAUTHORIZED",
             );
           }
-          (context as AuthContext<any>).auth = { token, user };
+          (context as AuthContext<any>).auth = {
+            token,
+            user: toUser(user),
+          };
         } catch (error) {
           throw new HttpError(
             "인증 정보가 올바르지 않습니다.",

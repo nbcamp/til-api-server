@@ -8,7 +8,6 @@ export const getMyPost = createRouter({
   description: "내 게시글을 가져옵니다.",
   authorized: true,
   async handler(ctx): Promise<Post> {
-    console.log(ctx.param);
     const post = await posts.findById(+ctx.param.postId, {
       userId: ctx.auth.user.id,
     });
