@@ -10,7 +10,7 @@ import { HttpError, HttpMethod, response } from "utils/http";
 import { InferType, TypeDescriptor, validate } from "utils/validator";
 
 import { jwt, users } from "services";
-import { User, toUser } from "models";
+import { AuthUser, toAuthUser } from "models";
 
 interface Body {
   [key: string]: any;
@@ -34,7 +34,7 @@ interface Context<TBody extends Body> {
 interface AuthContext<TBody extends Body> extends Context<TBody> {
   auth: {
     token: string;
-    user: User;
+    user: AuthUser;
   };
 }
 
@@ -102,7 +102,7 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
           }
           (context as AuthContext<any>).auth = {
             token,
-            user: toUser(user),
+            user: toAuthUser(user),
           };
         } catch (error) {
           throw new HttpError(

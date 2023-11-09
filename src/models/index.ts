@@ -1,4 +1,5 @@
-export type { Auth } from "./Auth";
+export type { AuthUser, Auth } from "./Auth";
+export { toAuthUser } from "./Auth";
 
 export type { User, RawUser } from "./User";
 export { toUser } from "./User";

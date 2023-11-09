@@ -1,8 +1,8 @@
 import { createRouter } from "router";
-import format from "date-fns/format";
 import pkg from "/package.json";
+import { formatISO } from "date-fns";
 
-const BUILD = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+const BUILD = formatISO(new Date());
 const ENV = Bun.env.NODE_ENV || "development";
 const TZ = Bun.env.TZ;
 

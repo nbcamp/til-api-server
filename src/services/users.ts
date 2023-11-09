@@ -63,7 +63,15 @@ export function create(input: {
 }) {
   return prisma.user.create({
     data: { ...input },
-    include: userInclude,
+    include: {
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          followings: true,
+        },
+      },
+    },
   });
 }
 
@@ -77,7 +85,15 @@ export function update(
   return prisma.user.update({
     where: { id },
     data: input,
-    include: userInclude,
+    include: {
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          followings: true,
+        },
+      },
+    },
   });
 }
 
@@ -101,7 +117,15 @@ export function sync(id: number) {
       lastSignedAt: new Date(),
       deletedAt: null,
     },
-    include: userInclude,
+    include: {
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          followings: true,
+        },
+      },
+    },
   });
 }
 

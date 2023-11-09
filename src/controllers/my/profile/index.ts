@@ -1,5 +1,5 @@
 import { createRouter } from "router";
-import { User, toUser } from "models";
+import { AuthUser, toAuthUser } from "models";
 import { users } from "services";
 
 import { nullable, optional } from "utils/validator";
@@ -7,7 +7,7 @@ import { nullable, optional } from "utils/validator";
 export const getMyProfile = createRouter({
   description: "내 프로필을 가져옵니다.",
   authorized: true,
-  async handler(ctx): Promise<User> {
+  async handler(ctx): Promise<AuthUser> {
     return ctx.auth.user;
   },
 });
@@ -20,9 +20,9 @@ export const updateMyProfile = createRouter({
     username: optional(nullable("string")),
     avatarUrl: optional(nullable("string")),
   },
-  async handler(ctx): Promise<User> {
+  async handler(ctx): Promise<AuthUser> {
     const user = await users.update(ctx.auth.user.id, ctx.body);
-    return toUser(user);
+    return toAuthUser(user);
   },
 });
 

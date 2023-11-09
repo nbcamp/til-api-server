@@ -1,6 +1,6 @@
 import { createRouter } from "router";
 import { jwt, users } from "services";
-import { Auth, toUser } from "models";
+import { Auth, toAuthUser } from "models";
 
 import { HttpError } from "utils/http";
 import { nullable, optional } from "utils/validator";
@@ -27,7 +27,7 @@ export const signIn = createRouter({
 
     return {
       accessToken: jwt.sign({ id: user.id }),
-      user: toUser(user),
+      user: toAuthUser(user),
     };
   },
 });
