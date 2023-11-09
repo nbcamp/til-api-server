@@ -2,53 +2,22 @@ import { HttpError } from "utils/http";
 import { prisma } from "prisma";
 import { unixTimeToDate } from "utils/datetime";
 import { isBefore } from "date-fns";
-import { CursorBasedPagination } from "utils/pagination";
-import { userInclude } from "./users";
 
-export async function findAll(
-  pagination?: CursorBasedPagination,
-  where?: { blogId?: number; userId?: number },
-  include?: { user?: boolean },
-) {
-  const q = pagination?.q?.trim();
-  const { cursor, limit, desc } = pagination ?? {};
-  const { blogId, userId } = where ?? {};
-  const list = await prisma.post.findMany({
+export function findAll(where: { userId: number; blogId?: number }) {
+  return prisma.post.findMany({
     where: {
-      userId,
-      blogId,
-      ...(q && {
-        OR: [
-          { title: { contains: q } },
-          { content: { contains: q } },
-          { postTags: { some: { tag: { contains: q } } } },
-        ],
-      }),
+      userId: where.userId,
+      blogId: where?.blogId,
     },
     include: {
       postTags: true,
-      ...(include?.user && {
-        user: {
-          include: userInclude,
-        },
-      }),
       postLikes: {
-        where: { userId },
+        where: { userId: where.userId },
         take: 1,
       },
     },
-    ...(cursor && {
-      cursor: { id: cursor },
-      skip: 1,
-    }),
-    take: limit ?? 100,
-    orderBy: { publishedAt: desc ? "desc" : "asc" },
+    orderBy: { publishedAt: "desc" },
   });
-
-  return list.map((post) => ({
-    ...post,
-    liked: post.postLikes.length > 0,
-  }));
 }
 
 export function findById(
@@ -57,7 +26,13 @@ export function findById(
 ) {
   return prisma.post.findFirst({
     where: { id: postId, ...where },
-    include: { postTags: true },
+    include: {
+      postTags: true,
+      postLikes: {
+        where: { userId: where?.userId },
+        take: 1,
+      },
+    },
   });
 }
 
@@ -119,7 +94,13 @@ export async function create(input: {
         },
         publishedAt,
       },
-      include: { postTags: true },
+      include: {
+        postTags: true,
+        postLikes: {
+          where: { userId },
+          take: 1,
+        },
+      },
     });
   });
 }

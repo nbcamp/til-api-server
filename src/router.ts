@@ -179,15 +179,17 @@ async function makeFileSystemBasedRouterMap(
         } satisfies NormalizedRouter;
       });
     }),
-  ).then((routers) => routers.flat().sort((a, b) => a.priority - b.priority));
+  ).then((routers) =>
+    routers.flat().toSorted((a, b) => a.priority - b.priority),
+  );
 
   for (const router of routers) {
     const method = router.method.toUpperCase().padEnd(6);
     const path = router.path.padEnd(50);
     const operationId = router.operationId.padEnd(20);
     const description = router.description;
-    const message = `Operation: ${operationId} | ${method} | ${path} | ${description}`;
-    logger.info(message);
+    const message = `${operationId} | ${path} | ${description}`;
+    logger.info(message, { label: method });
   }
 
   return routers;

@@ -1,14 +1,12 @@
 import { createRouter } from "router";
 import { posts } from "services";
 import { Post, toPost } from "models";
-import { normalizePaginationQuery } from "utils/pagination";
 
 export const getMyPostsByBlog = createRouter({
   description: "내 블로그의 글 목록을 가져옵니다.",
   authorized: true,
   async handler(ctx) {
-    const options = normalizePaginationQuery(ctx.query);
-    const list = await posts.findAll(options, {
+    const list = await posts.findAll({
       userId: ctx.auth.user.id,
       blogId: +ctx.param.blogId,
     });
