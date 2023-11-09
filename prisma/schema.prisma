@@ -18,7 +18,7 @@ model User {
   provider     String?   @map("provider") @db.VarChar(10)
   providerId   String?   @map("provider_id") @db.VarChar(100)
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
   lastSignedAt DateTime? @map("last_signed_at") @db.Timestamp(0)
   deletedAt    DateTime? @map("deleted_at") @db.Timestamp(0)
 
@@ -54,7 +54,7 @@ model Blog {
   main            Boolean   @default(false)
   lastPublishedAt DateTime? @map("last_published_at") @db.Timestamp(0)
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamp(0)
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts          Post[]
@@ -74,7 +74,7 @@ model Post {
   url         String   @unique @db.VarChar(512)
   publishedAt DateTime @map("published_at") @db.Timestamp(0)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(0)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
 
   blog      Blog       @relation(fields: [blogId], references: [id], onDelete: Cascade)
   user      User       @relation(fields: [userId], references: [id])
