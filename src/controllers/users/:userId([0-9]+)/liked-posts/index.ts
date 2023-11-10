@@ -9,13 +9,9 @@ export const getUserLikedPosts = createRouter({
   authorized: true,
   async handler(ctx): Promise<Post[]> {
     const options = normalizePaginationQuery(ctx.query);
-    const list = await likes.findAllPosts(
-      options,
-      {
-        userId: +ctx.param.userId,
-      },
-      { user: true },
-    );
+    const list = await likes.findAllPosts(ctx.auth.user.id, options, {
+      userId: +ctx.param.userId,
+    });
     return Promise.all(
       list.map(({ post }) => ({
         ...toCommunityPost(post as unknown as RawCommunityPost),

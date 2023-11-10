@@ -8,9 +8,7 @@ export const getCommunityPosts = createRouter({
   authorized: true,
   async handler(ctx): Promise<CommunityPost[]> {
     const option = normalizePaginationQuery(ctx.query);
-    const postList = await community.findAll(option, {
-      userId: ctx.auth.user.id,
-    });
+    const postList = await community.findAll(ctx.auth.user.id, option);
     return Promise.all(postList.map(toCommunityPost));
   },
 });

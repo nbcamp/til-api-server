@@ -3,12 +3,11 @@ import { CursorBasedPagination } from "utils/pagination";
 import { userInclude } from "./users";
 
 export async function findAll(
+  authUserId: number,
   pagination?: CursorBasedPagination,
-  where?: { userId: number },
 ) {
   const q = pagination?.q?.trim();
   const { cursor, limit, desc } = pagination ?? {};
-  const { userId } = where ?? {};
   const list = await prisma.post.findMany({
     where: {
       ...(q && {
@@ -22,10 +21,10 @@ export async function findAll(
     include: {
       postTags: true,
       user: {
-        include: userInclude(userId),
+        include: userInclude(authUserId),
       },
       postLikes: {
-        where: { userId },
+        where: { userId: authUserId },
         take: 1,
       },
     },
