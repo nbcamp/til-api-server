@@ -13,6 +13,7 @@ export interface AuthUser {
   posts: number;
   followers: number;
   followings: number;
+  hasBlog: boolean;
 }
 
 export interface RawAuthUser {
@@ -24,6 +25,7 @@ export interface RawAuthUser {
     posts: number;
     followers: number;
     followings: number;
+    blogs: number;
   };
 }
 
@@ -36,5 +38,6 @@ export function toAuthUser(raw: RawAuthUser): AuthUser {
     posts: raw._count.posts,
     followers: raw._count.followers,
     followings: raw._count.followings,
+    hasBlog: raw._count.blogs > 0,
   };
 }

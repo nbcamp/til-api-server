@@ -11,6 +11,7 @@ export const userInclude = (userId?: number) =>
         posts: true,
         followers: true,
         followings: true,
+        blogs: true,
       },
     },
     blogs: {
@@ -41,6 +42,7 @@ export async function findAuthUser(id: number) {
           posts: true,
           followers: true,
           followings: true,
+          blogs: true,
         },
       },
     },

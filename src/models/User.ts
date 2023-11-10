@@ -11,6 +11,7 @@ export interface User {
   isMyFollowing: boolean;
   isMyFollower: boolean;
   lastPublishedAt: number | null;
+  hasBlog: boolean;
 }
 
 export interface RawUser {
@@ -22,6 +23,7 @@ export interface RawUser {
     posts: number;
     followers: number;
     followings: number;
+    blogs: number;
   };
   blogs: {
     lastPublishedAt: Date | null;
@@ -51,5 +53,6 @@ export function toUser(raw: RawUser): User {
       (following) => following.followingId === raw.id,
     ),
     lastPublishedAt: dateToUnixTime(raw.blogs[0]?.lastPublishedAt),
+    hasBlog: raw._count.blogs > 0,
   };
 }
