@@ -4,30 +4,54 @@ import { prisma } from "prisma";
 import { HttpError } from "utils/http";
 import { CursorBasedPagination } from "utils/pagination";
 
-export const userInclude: Prisma.UserInclude = {
-  _count: {
-    select: {
-      posts: true,
-      followers: true,
-      followings: true,
+export const userInclude = (userId?: number) =>
+  ({
+    _count: {
+      select: {
+        posts: true,
+        followers: true,
+        followings: true,
+      },
     },
-  },
-  blogs: {
-    select: {
-      lastPublishedAt: true,
+    blogs: {
+      select: {
+        lastPublishedAt: true,
+      },
+      orderBy: {
+        lastPublishedAt: "desc",
+      },
+      take: 1,
     },
-    orderBy: {
-      lastPublishedAt: "desc",
+    followers: {
+      where: { followerId: userId },
+      take: 1,
     },
-    take: 1,
-  },
-};
+    followings: {
+      where: { followingId: userId },
+      take: 1,
+    },
+  }) satisfies Prisma.UserInclude;
+
+export async function findAuthUser(id: number) {
+  return await prisma.user.findUnique({
+    where: { id },
+    include: {
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          followings: true,
+        },
+      },
+    },
+  });
+}
 
 export async function findById(id: number) {
   try {
     return await prisma.user.findUniqueOrThrow({
       where: { id },
-      include: userInclude,
+      include: userInclude(id),
     });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
@@ -39,10 +63,6 @@ export async function findById(id: number) {
   }
 }
 
-export async function findByIds(ids: number[]) {
-  return prisma.user.findMany({ where: { id: { in: ids } } });
-}
-
 export async function findByProvider(provider: string, providerId: string) {
   return prisma.user.findUnique({
     where: {
@@ -51,7 +71,15 @@ export async function findByProvider(provider: string, providerId: string) {
         providerId,
       },
     },
-    include: userInclude,
+    include: {
+      _count: {
+        select: {
+          posts: true,
+          followers: true,
+          followings: true,
+        },
+      },
+    },
   });
 }
 
@@ -138,7 +166,7 @@ export async function findFollowers(
     where: { followingId: where?.userId },
     include: {
       follower: {
-        include: userInclude,
+        include: userInclude(where?.userId),
       },
     },
     ...(cursor && {
@@ -160,7 +188,7 @@ export async function findFollowings(
     where: { followerId: where?.userId },
     include: {
       following: {
-        include: userInclude,
+        include: userInclude(where?.userId),
       },
     },
     ...(cursor && {

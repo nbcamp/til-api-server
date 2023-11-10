@@ -19,7 +19,7 @@ export function findAllPosts(
           postTags: true,
           ...(include?.user && {
             user: {
-              include: userInclude,
+              include: userInclude(userId),
             },
           }),
         },

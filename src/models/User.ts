@@ -8,6 +8,8 @@ export interface User {
   posts: number;
   followers: number;
   followings: number;
+  isMyFollowing: boolean;
+  isMyFollower: boolean;
   lastPublishedAt: number | null;
 }
 
@@ -24,9 +26,16 @@ export interface RawUser {
   blogs: {
     lastPublishedAt: Date | null;
   }[];
+  followers: {
+    followingId: number;
+  }[];
+  followings: {
+    followerId: number;
+  }[];
 }
 
 export function toUser(raw: RawUser): User {
+  console.log(raw.id, raw.followers);
   return {
     id: raw.id,
     username: raw.username,
@@ -35,6 +44,12 @@ export function toUser(raw: RawUser): User {
     posts: raw._count.posts,
     followers: raw._count.followers,
     followings: raw._count.followings,
+    isMyFollower: raw.followings.some(
+      (follower) => follower.followerId === raw.id,
+    ),
+    isMyFollowing: raw.followers.some(
+      (following) => following.followingId === raw.id,
+    ),
     lastPublishedAt: dateToUnixTime(raw.blogs[0]?.lastPublishedAt),
   };
 }

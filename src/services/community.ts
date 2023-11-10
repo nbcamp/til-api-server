@@ -22,7 +22,7 @@ export async function findAll(
     include: {
       postTags: true,
       user: {
-        include: userInclude,
+        include: userInclude(userId),
       },
       postLikes: {
         where: { userId },

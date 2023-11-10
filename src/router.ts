@@ -93,7 +93,7 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
         }
         try {
           const payload = jwt.verify<{ id: number }>(token);
-          const user = await users.findById(payload.id);
+          const user = await users.findAuthUser(payload.id);
           if (!user || user.deletedAt) {
             throw new HttpError(
               "사용자 정보를 찾을 수 없습니다.",
