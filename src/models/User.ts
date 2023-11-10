@@ -37,7 +37,6 @@ export interface RawUser {
 }
 
 export function toUser(raw: RawUser): User {
-  console.log(raw.id, raw.followers);
   return {
     id: raw.id,
     username: raw.username,

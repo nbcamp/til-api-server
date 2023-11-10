@@ -49,11 +49,11 @@ export async function findAuthUser(id: number) {
   });
 }
 
-export async function findById(id: number) {
+export async function findById(authUserId: number, userId: number) {
   try {
     return await prisma.user.findUniqueOrThrow({
-      where: { id },
-      include: userInclude(id),
+      where: { id: userId },
+      include: userInclude(authUserId),
     });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
@@ -212,11 +212,16 @@ export async function follow(fromId: number, toId: number) {
     return null;
   }
 
-  return prisma.follow.create({
+  await prisma.follow.create({
     data: {
       followerId: fromId,
       followingId: toId,
     },
+  });
+
+  return prisma.user.findUnique({
+    where: { id: toId },
+    include: userInclude(fromId),
   });
 }
 
@@ -229,12 +234,17 @@ export async function unfollow(fromId: number, toId: number) {
     return null;
   }
 
-  return prisma.follow.delete({
+  await prisma.follow.delete({
     where: {
       followerFollowingIndex: {
         followerId: fromId,
         followingId: toId,
       },
     },
+  });
+
+  return prisma.user.findUnique({
+    where: { id: toId },
+    include: userInclude(fromId),
   });
 }

@@ -8,7 +8,7 @@ export const unfollowUser = createRouter({
   authorized: true,
   async handler(ctx): Promise<boolean> {
     const userId = +ctx.param.id;
-    const toUser = await users.findById(userId);
+    const toUser = await users.findById(ctx.auth.user.id, userId);
     if (!toUser) {
       throw new HttpError("사용자를 찾을 수 없습니다.", "NOT_FOUND");
     }
