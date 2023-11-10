@@ -8,9 +8,7 @@ export const getMyFollowers = createRouter({
   authorized: true,
   async handler(ctx): Promise<User[]> {
     const options = normalizePaginationQuery(ctx.query);
-    const list = await users.findFollowers(options, {
-      userId: ctx.auth.user.id,
-    });
+    const list = await users.findFollowers(ctx.auth.user.id, options);
     return Promise.all(list.map(async (user) => toUser(user)));
   },
 });

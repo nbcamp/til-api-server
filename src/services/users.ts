@@ -4,34 +4,34 @@ import { prisma } from "prisma";
 import { HttpError } from "utils/http";
 import { CursorBasedPagination } from "utils/pagination";
 
-export const userInclude = (userId?: number) =>
-  ({
-    _count: {
-      select: {
-        posts: true,
-        followers: true,
-        followings: true,
-        blogs: true,
-      },
+// TODO: AuthUser Context 전달하도록 개선
+export const userInclude = (authUserId: number): Prisma.UserInclude => ({
+  _count: {
+    select: {
+      posts: true,
+      followers: true,
+      followings: true,
+      blogs: true,
     },
-    blogs: {
-      select: {
-        lastPublishedAt: true,
-      },
-      orderBy: {
-        lastPublishedAt: "desc",
-      },
-      take: 1,
+  },
+  blogs: {
+    select: {
+      lastPublishedAt: true,
     },
-    followers: {
-      where: { followerId: userId },
-      take: 1,
+    orderBy: {
+      lastPublishedAt: "desc",
     },
-    followings: {
-      where: { followingId: userId },
-      take: 1,
-    },
-  }) satisfies Prisma.UserInclude;
+    take: 1,
+  },
+  followers: {
+    where: { followerId: authUserId },
+    take: 1,
+  },
+  followings: {
+    where: { followingId: authUserId },
+    take: 1,
+  },
+});
 
 export async function findAuthUser(id: number) {
   return await prisma.user.findUnique({
@@ -160,15 +160,15 @@ export function sync(id: number) {
 }
 
 export async function findFollowers(
+  userId: number,
   pagination?: CursorBasedPagination,
-  where?: { userId: number },
 ) {
   const { cursor, limit, desc } = pagination ?? {};
   const followerMaps = await prisma.follow.findMany({
-    where: { followingId: where?.userId },
+    where: { followingId: userId },
     include: {
       follower: {
-        include: userInclude(where?.userId),
+        include: userInclude(userId),
       },
     },
     ...(cursor && {
@@ -182,15 +182,15 @@ export async function findFollowers(
 }
 
 export async function findFollowings(
+  userId: number,
   pagination?: CursorBasedPagination,
-  where?: { userId: number },
 ) {
   const { cursor, limit, desc } = pagination ?? {};
   const followingMaps = await prisma.follow.findMany({
-    where: { followerId: where?.userId },
+    where: { followerId: userId },
     include: {
       following: {
-        include: userInclude(where?.userId),
+        include: userInclude(userId),
       },
     },
     ...(cursor && {

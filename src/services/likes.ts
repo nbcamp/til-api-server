@@ -5,9 +5,9 @@ import { CursorBasedPagination } from "utils/pagination";
 import { userInclude } from "./users";
 
 export function findAllPosts(
+  authUserId: number,
   pagination?: CursorBasedPagination,
   where?: { userId?: number },
-  include?: { user?: boolean },
 ) {
   const { cursor, limit, desc } = pagination ?? {};
   const { userId } = where ?? {};
@@ -17,11 +17,9 @@ export function findAllPosts(
       post: {
         include: {
           postTags: true,
-          ...(include?.user && {
-            user: {
-              include: userInclude(userId),
-            },
-          }),
+          user: {
+            include: userInclude(authUserId),
+          },
         },
       },
     },
@@ -36,9 +34,20 @@ export function findAllPosts(
 
 export async function likePost(where: { userId: number; postId: number }) {
   try {
-    return await prisma.postLike.create({
+    const result = await prisma.postLike.create({
       data: where,
+      include: {
+        post: {
+          include: {
+            postTags: true,
+            postLikes: {
+              take: 1,
+            },
+          },
+        },
+      },
     });
+    return result.post;
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       // The .code property can be accessed in a type-safe manner
@@ -55,14 +64,26 @@ export async function likePost(where: { userId: number; postId: number }) {
 
 export async function unlikePost(where: { userId: number; postId: number }) {
   try {
-    return await prisma.postLike.delete({
+    const result = await prisma.postLike.delete({
       where: {
         postLikeIndex: {
           userId: where.userId,
           postId: where.postId,
         },
       },
+      include: {
+        post: {
+          include: {
+            postTags: true,
+            postLikes: {
+              take: 1,
+            },
+          },
+        },
+      },
     });
+    result.post.postLikes = [];
+    return result.post;
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2025") {
