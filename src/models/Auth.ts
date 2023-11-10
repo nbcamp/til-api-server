@@ -10,6 +10,7 @@ export interface AuthUser {
   username: string | null;
   avatarUrl: string | null;
   lastSignedAt: Date | null;
+  lastPublishedAt?: Date | null;
   posts: number;
   followers: number;
   followings: number;
@@ -21,6 +22,7 @@ export interface RawAuthUser {
   username: string | null;
   avatarUrl: string | null;
   lastSignedAt: Date | null;
+  lastPublishedAt?: Date | null;
   _count: {
     posts: number;
     followers: number;
@@ -35,6 +37,7 @@ export function toAuthUser(raw: RawAuthUser): AuthUser {
     username: raw.username,
     avatarUrl: raw.avatarUrl,
     lastSignedAt: dateToUnixTime(raw.lastSignedAt),
+    lastPublishedAt: dateToUnixTime(raw.lastPublishedAt),
     posts: raw._count.posts,
     followers: raw._count.followers,
     followings: raw._count.followings,

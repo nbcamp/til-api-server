@@ -45,6 +45,15 @@ export async function findAuthUser(id: number) {
           blogs: true,
         },
       },
+      blogs: {
+        select: {
+          lastPublishedAt: true,
+        },
+        orderBy: {
+          lastPublishedAt: "desc",
+        },
+        take: 1,
+      },
     },
   });
 }
