@@ -20,6 +20,10 @@ export function findAllPosts(
           user: {
             include: userInclude(authUserId),
           },
+          postLikes: {
+            where: { userId: authUserId },
+            take: 1,
+          },
         },
       },
     },

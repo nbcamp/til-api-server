@@ -1,6 +1,6 @@
 import { createRouter } from "router";
 import { likes } from "services";
-import { Post, RawCommunityPost, toCommunityPost } from "models";
+import { Post, toCommunityPost } from "models";
 import { normalizePaginationQuery } from "utils/pagination";
 
 export const getUserLikedPosts = createRouter({
@@ -12,11 +12,6 @@ export const getUserLikedPosts = createRouter({
     const list = await likes.findAllPosts(ctx.auth.user.id, options, {
       userId: +ctx.param.userId,
     });
-    return Promise.all(
-      list.map(({ post }) => ({
-        ...toCommunityPost(post as unknown as RawCommunityPost),
-        liked: true,
-      })),
-    );
+    return Promise.all(list.map(({ post }) => toCommunityPost(post)));
   },
 });
