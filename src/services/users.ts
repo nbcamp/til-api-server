@@ -33,6 +33,26 @@ export const userInclude = (authUserId: number): Prisma.UserInclude => ({
   },
 });
 
+export const authUserInclude = (): Prisma.UserInclude => ({
+  _count: {
+    select: {
+      posts: true,
+      followers: true,
+      followings: true,
+      blogs: true,
+    },
+  },
+  blogs: {
+    select: {
+      lastPublishedAt: true,
+    },
+    orderBy: {
+      lastPublishedAt: "desc",
+    },
+    take: 1,
+  },
+});
+
 export async function checkAuthorized(id: number) {
   try {
     return await prisma.user.findUniqueOrThrow({
@@ -53,25 +73,7 @@ export async function findAuthUser(id: number) {
   try {
     return await prisma.user.findUniqueOrThrow({
       where: { id },
-      include: {
-        _count: {
-          select: {
-            posts: true,
-            followers: true,
-            followings: true,
-            blogs: true,
-          },
-        },
-        blogs: {
-          select: {
-            lastPublishedAt: true,
-          },
-          orderBy: {
-            lastPublishedAt: "desc",
-          },
-          take: 1,
-        },
-      },
+      include: authUserInclude(),
     });
   } catch {
     throw new HttpError("사용자 정보를 찾을 수 없습니다.", "NOT_FOUND");
@@ -102,15 +104,6 @@ export async function findByProvider(provider: string, providerId: string) {
         providerId,
       },
     },
-    include: {
-      _count: {
-        select: {
-          posts: true,
-          followers: true,
-          followings: true,
-        },
-      },
-    },
   });
 }
 
@@ -122,16 +115,6 @@ export function create(input: {
 }) {
   return prisma.user.create({
     data: { ...input },
-    include: {
-      _count: {
-        select: {
-          posts: true,
-          followers: true,
-          followings: true,
-          blogs: true,
-        },
-      },
-    },
   });
 }
 
@@ -145,15 +128,16 @@ export function update(
   return prisma.user.update({
     where: { id },
     data: input,
-    include: {
-      _count: {
-        select: {
-          posts: true,
-          followers: true,
-          followings: true,
-          blogs: true,
-        },
-      },
+    include: authUserInclude(),
+  });
+}
+
+export function sync(id: number) {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      lastSignedAt: new Date(),
+      deletedAt: null,
     },
   });
 }
@@ -166,26 +150,6 @@ export async function remove(id: number) {
       deletedAt: new Date(),
       blogs: {
         deleteMany: {},
-      },
-    },
-  });
-}
-
-export function sync(id: number) {
-  return prisma.user.update({
-    where: { id },
-    data: {
-      lastSignedAt: new Date(),
-      deletedAt: null,
-    },
-    include: {
-      _count: {
-        select: {
-          posts: true,
-          followers: true,
-          followings: true,
-          blogs: true,
-        },
       },
     },
   });
