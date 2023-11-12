@@ -49,10 +49,10 @@ const logger = winston.createLogger({
 
         if (request instanceof Request) {
           const id = colorize("id", `[${_id}]`);
-          const url = new URL(request.url);
+          const { pathname, search } = new URL(request.url);
           const method = colorize("method", request.method);
-          const pathname = colorize("url", url.pathname);
-          return build(`${id} ${method} ${pathname}`);
+          const path = colorize("url", `${pathname}${search}`);
+          return build(`${id} ${method} ${path}`);
         }
 
         if (response instanceof Response) {
