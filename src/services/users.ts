@@ -33,29 +33,49 @@ export const userInclude = (authUserId: number): Prisma.UserInclude => ({
   },
 });
 
+export async function checkAuthorized(id: number) {
+  try {
+    return await prisma.user.findUniqueOrThrow({
+      where: { id, deletedAt: null },
+      select: { id: true },
+    });
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        throw new HttpError("사용자 정보를 찾을 수 없습니다.", "NOT_FOUND");
+      }
+    }
+    throw error;
+  }
+}
+
 export async function findAuthUser(id: number) {
-  return await prisma.user.findUnique({
-    where: { id },
-    include: {
-      _count: {
-        select: {
-          posts: true,
-          followers: true,
-          followings: true,
-          blogs: true,
+  try {
+    return await prisma.user.findUniqueOrThrow({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            posts: true,
+            followers: true,
+            followings: true,
+            blogs: true,
+          },
+        },
+        blogs: {
+          select: {
+            lastPublishedAt: true,
+          },
+          orderBy: {
+            lastPublishedAt: "desc",
+          },
+          take: 1,
         },
       },
-      blogs: {
-        select: {
-          lastPublishedAt: true,
-        },
-        orderBy: {
-          lastPublishedAt: "desc",
-        },
-        take: 1,
-      },
-    },
-  });
+    });
+  } catch {
+    throw new HttpError("사용자 정보를 찾을 수 없습니다.", "NOT_FOUND");
+  }
 }
 
 export async function findById(authUserId: number, userId: number) {

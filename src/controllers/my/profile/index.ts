@@ -8,7 +8,7 @@ export const getMyProfile = createRouter({
   description: "내 프로필을 가져옵니다.",
   authorized: true,
   async handler(ctx): Promise<AuthUser> {
-    return ctx.auth.user;
+    return toAuthUser(await users.findAuthUser(ctx.auth.user.id));
   },
 });
 

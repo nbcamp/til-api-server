@@ -10,7 +10,6 @@ import { HttpError, HttpMethod, response } from "utils/http";
 import { InferType, TypeDescriptor, validate } from "utils/validator";
 
 import { jwt, users } from "services";
-import { AuthUser, toAuthUser } from "models";
 
 interface Body {
   [key: string]: any;
@@ -33,8 +32,7 @@ interface Context<TBody extends Body> {
 
 interface AuthContext<TBody extends Body> extends Context<TBody> {
   auth: {
-    token: string;
-    user: AuthUser;
+    user: { id: number };
   };
 }
 
@@ -93,22 +91,15 @@ export function createRouter<Descriptor extends TypeDescriptor = never>(
         }
         try {
           const payload = jwt.verify<{ id: number }>(token);
-          const user = await users.findAuthUser(payload.id);
-          if (!user || user.deletedAt) {
-            throw new HttpError(
-              "사용자 정보를 찾을 수 없습니다.",
-              "UNAUTHORIZED",
-            );
-          }
+          const user = await users.checkAuthorized(payload.id);
           (context as AuthContext<any>).auth = {
-            token,
-            user: toAuthUser(user),
+            user,
           };
         } catch (error) {
           throw new HttpError(
             "인증 정보가 올바르지 않습니다.",
-            "UNAUTHORIZED",
-            error as Error,
+            "BAD_REQUEST",
+            error,
           );
         }
       }
@@ -214,7 +205,7 @@ export default async (req: Request): Promise<Response> => {
 
     try {
       logger.info("REQ", { request: req, id: requestId });
-      const body = await tryCatch(() => req.json());
+      const body = await tryCatch(() => parseRequestBody(req));
       const result = await router.handler({
         param,
         query: Object.fromEntries(url.searchParams.entries()),
@@ -252,3 +243,16 @@ export default async (req: Request): Promise<Response> => {
 
   return response({ error: "Not Found" }, "NOT_FOUND");
 };
+
+function parseRequestBody(req: Request) {
+  const contentType = req.headers.get("Content-Type");
+  if (!contentType) {
+    return null;
+  }
+
+  if (contentType.includes("application/json")) {
+    return req.json();
+  }
+
+  return null;
+}

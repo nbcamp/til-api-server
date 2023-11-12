@@ -23,7 +23,7 @@ export class HttpError extends Error {
     return HttpStatusCode[this.status];
   }
 
-  constructor(message: string, status: Status, cause?: Error) {
+  constructor(message: string, status: Status, cause?: unknown) {
     super(message);
     this.status = status;
     this.cause = cause;
