@@ -24,9 +24,13 @@ model User {
 
   blogs      Blog[]
   posts      Post[]
-  followers  Follow[]   @relation("following")
-  followings Follow[]   @relation("follower")
+  followers  Follow[]     @relation("following")
+  followings Follow[]     @relation("follower")
   postlikes  PostLike[]
+  reporteds  UserReport[] @relation("reported")
+  reporters  UserReport[] @relation("reporter")
+  blockers   UserBlock[]  @relation("blocker")
+  blockeds   UserBlock[]  @relation("blocked")
 
   @@unique([provider, providerId], name: "providerIndex")
   @@map("users")
@@ -120,4 +124,29 @@ model PostLike {
 
   @@unique([postId, userId], name: "postLikeIndex")
   @@map("post_likes")
+}
+
+model UserReport {
+  id         Int    @id @default(autoincrement())
+  reporterId Int    @map("reporter_id")
+  reportedId Int    @map("reported_id")
+  reason     String @db.VarChar(100)
+
+  reporter User @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User @relation("reported", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  @@unique([reporterId, reportedId], name: "userReportIndex")
+  @@map("user_reports")
+}
+
+model UserBlock {
+  id        Int @id @default(autoincrement())
+  blockerId Int @map("blocker_id")
+  blockedId Int @map("blocked_id")
+
+  blocker User @relation("blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId], name: "userBlockIndex")
+  @@map("user_blocks")
 }

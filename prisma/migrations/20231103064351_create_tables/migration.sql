@@ -45,8 +45,8 @@ CREATE TABLE `blogs` (
 -- CreateTable
 CREATE TABLE `posts` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `blog_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
+    `blog_id` INTEGER NOT NULL,
     `title` VARCHAR(50) NOT NULL,
     `content` VARCHAR(100) NOT NULL,
     `url` VARCHAR(512) NOT NULL,
@@ -85,8 +85,8 @@ CREATE TABLE `keyword_tag_maps` (
 -- CreateTable
 CREATE TABLE `post_likes` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `post_id` INTEGER NOT NULL,
     `user_id` INTEGER NOT NULL,
+    `post_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `post_likes_post_id_user_id_key`(`post_id`, `user_id`),
     PRIMARY KEY (`id`)

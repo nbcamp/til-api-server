@@ -17,6 +17,13 @@ export async function findAll(
           { postTags: { some: { tag: { contains: q } } } },
         ],
       }),
+      user: {
+        blockeds: {
+          none: {
+            blockerId: authUserId,
+          },
+        },
+      },
     },
     include: {
       postTags: true,
