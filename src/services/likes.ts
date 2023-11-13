@@ -9,7 +9,7 @@ export function findAllPosts(
   pagination?: CursorBasedPagination,
   where?: { userId?: number },
 ) {
-  const { cursor, limit, desc } = pagination ?? {};
+  const { cursor, limit, sort } = pagination ?? {};
   const { userId } = where ?? {};
   return prisma.postLike.findMany({
     where: { userId },
@@ -32,7 +32,7 @@ export function findAllPosts(
       skip: 1,
     }),
     take: limit ?? 100,
-    orderBy: { id: desc ? "desc" : "asc" },
+    orderBy: { id: sort },
   });
 }
 

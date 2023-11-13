@@ -2,7 +2,7 @@ export interface CursorBasedPagination {
   q?: string;
   cursor?: number;
   limit?: number;
-  desc?: boolean;
+  sort?: "asc" | "desc";
 }
 
 export function normalizePaginationQuery(
@@ -12,6 +12,6 @@ export function normalizePaginationQuery(
     q: typeof query.q === "string" ? query.q.trim() : undefined,
     cursor: query.cursor ? +query.cursor : undefined,
     limit: query.limit ? +query.limit : undefined,
-    desc: query.desc === "true",
+    sort: query.sort === "desc" ? "desc" : "asc",
   };
 }

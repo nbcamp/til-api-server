@@ -159,7 +159,7 @@ export async function findFollowers(
   userId: number,
   pagination?: CursorBasedPagination,
 ) {
-  const { cursor, limit, desc } = pagination ?? {};
+  const { cursor, limit, sort } = pagination ?? {};
   const followerMaps = await prisma.follow.findMany({
     where: { followingId: userId },
     include: {
@@ -172,7 +172,7 @@ export async function findFollowers(
       skip: 1,
     }),
     take: limit ?? 100,
-    orderBy: { id: desc ? "desc" : "asc" },
+    orderBy: { id: sort },
   });
   return followerMaps.map(({ follower }) => follower);
 }
@@ -181,7 +181,7 @@ export async function findFollowings(
   userId: number,
   pagination?: CursorBasedPagination,
 ) {
-  const { cursor, limit, desc } = pagination ?? {};
+  const { cursor, limit, sort } = pagination ?? {};
   const followingMaps = await prisma.follow.findMany({
     where: { followerId: userId },
     include: {
@@ -194,7 +194,7 @@ export async function findFollowings(
       skip: 1,
     }),
     take: limit ?? 100,
-    orderBy: { id: desc ? "desc" : "asc" },
+    orderBy: { id: sort },
   });
   return followingMaps.map(({ following }) => following);
 }

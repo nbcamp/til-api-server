@@ -7,7 +7,7 @@ export async function findAll(
   pagination?: CursorBasedPagination,
 ) {
   const q = pagination?.q?.trim();
-  const { cursor, limit, desc } = pagination ?? {};
+  const { cursor, limit, sort } = pagination ?? {};
   const list = await prisma.post.findMany({
     where: {
       ...(q && {
@@ -40,7 +40,9 @@ export async function findAll(
       skip: 1,
     }),
     take: limit ?? 100,
-    orderBy: { publishedAt: desc ? "desc" : "asc" },
+    orderBy: {
+      publishedAt: sort,
+    },
   });
 
   return list.map((post) => ({
