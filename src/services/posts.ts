@@ -50,12 +50,14 @@ export async function create(input: {
     throw new HttpError("블로그를 찾을 수 없습니다.", "NOT_FOUND");
   }
 
-  if (!input.url.includes(blog.url)) {
-    throw new HttpError(
-      "해당 게시글의 URL은 소유하지 않은 블로그의 주소입니다.",
-      "BAD_REQUEST",
-    );
-  }
+  // TODO: 본인이 등록한 블로그가 아니면 에러를 발생시키는 로직 추가
+  // 블로그 주소는 m.blog.naver.com인데, 게시글은 blog.naver.com으로 등록됨
+  // if (!input.url.includes(blog.url)) {
+  //   throw new HttpError(
+  //     "해당 게시글의 URL은 소유하지 않은 블로그의 주소입니다.",
+  //     "BAD_REQUEST",
+  //   );
+  // }
 
   if (await prisma.post.findFirst({ where: { url: input.url, userId } })) {
     throw new HttpError("이미 등록한 URL입니다.", "BAD_REQUEST");
@@ -122,15 +124,16 @@ export async function update(
   }
 
   if (await prisma.post.findFirst({ where: { url: input.url } })) {
-    throw new HttpError("이미 등록한 URL입니다.", "BAD_REQUEST");
+    throw new HttpError("이미 등록한 URL입니다.", "CONFLICT");
   }
 
-  if (!input.url?.includes(post.blog.url)) {
-    throw new HttpError(
-      "해당 TIL의 URL은 소유하지 않은 블로그의 주소입니다.",
-      "BAD_REQUEST",
-    );
-  }
+  // TODO: 본인이 등록한 블로그가 아니면 에러를 발생시키는 로직 추가
+  // if (!input.url?.includes(post.blog.url)) {
+  //   throw new HttpError(
+  //     "해당 게시글의 URL은 소유하지 않은 블로그의 주소입니다.",
+  //     "BAD_REQUEST",
+  //   );
+  // }
 
   return prisma.$transaction(async (tx) => {
     if (input.tags?.length) {
