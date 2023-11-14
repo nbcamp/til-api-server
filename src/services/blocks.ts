@@ -15,17 +15,33 @@ export async function findAll(userId: number) {
 
 export async function block(fromUserId: number, toUserId: number) {
   try {
-    const blockedUser = await prisma.userBlock.create({
-      data: {
-        blockerId: fromUserId,
-        blockedId: toUserId,
-      },
-      include: {
-        blocked: true,
-      },
-    });
+    return await prisma.$transaction(async (tx) => {
+      await tx.follow.deleteMany({
+        where: {
+          OR: [
+            {
+              followerId: fromUserId,
+              followingId: toUserId,
+            },
+            {
+              followerId: toUserId,
+              followingId: fromUserId,
+            },
+          ],
+        },
+      });
+      const blockedUser = await prisma.userBlock.create({
+        data: {
+          blockerId: fromUserId,
+          blockedId: toUserId,
+        },
+        include: {
+          blocked: true,
+        },
+      });
 
-    return blockedUser.blocked;
+      return blockedUser.blocked;
+    });
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
