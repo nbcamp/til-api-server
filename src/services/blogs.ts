@@ -132,6 +132,7 @@ export async function update(
             deleteMany: {},
             createMany: { data: input.keywords },
           },
+          lastPublishedAt: null,
         }),
       },
       include: { keywordTagMaps: true },
