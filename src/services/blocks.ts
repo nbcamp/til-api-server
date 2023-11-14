@@ -16,20 +16,30 @@ export async function findAll(userId: number) {
 export async function block(fromUserId: number, toUserId: number) {
   try {
     return await prisma.$transaction(async (tx) => {
-      await tx.follow.deleteMany({
-        where: {
-          OR: [
-            {
-              followerId: fromUserId,
-              followingId: toUserId,
+      await Promise.all([
+        tx.follow.deleteMany({
+          where: {
+            OR: [
+              {
+                followerId: fromUserId,
+                followingId: toUserId,
+              },
+              {
+                followerId: toUserId,
+                followingId: fromUserId,
+              },
+            ],
+          },
+        }),
+        tx.postLike.deleteMany({
+          where: {
+            userId: fromUserId,
+            post: {
+              userId: toUserId,
             },
-            {
-              followerId: toUserId,
-              followingId: fromUserId,
-            },
-          ],
-        },
-      });
+          },
+        }),
+      ]);
       const blockedUser = await prisma.userBlock.create({
         data: {
           blockerId: fromUserId,
