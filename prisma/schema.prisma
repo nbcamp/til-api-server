@@ -64,7 +64,6 @@ model Blog {
   posts          Post[]
   keywordTagMaps KeywordTagMap[]
 
-  @@unique([id, userId], name: "blogIdIndex")
   @@unique([userId, name], name: "userNameIndex")
   @@map("blogs")
 }
@@ -85,9 +84,7 @@ model Post {
   postTags  PostTag[]
   postLikes PostLike[]
 
-  @@unique([id, blogId], name: "postBlogIdIndex")
-  @@unique([id, userId], name: "postUserIdIndex")
-  @@index([publishedAt], name: "publishedAtIndex")
+  @@index(publishedAt, name: "publishedAtIndex")
   @@map("posts")
 }
 
