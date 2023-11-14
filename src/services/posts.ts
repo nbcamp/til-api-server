@@ -76,9 +76,17 @@ export async function create(input: {
       where: { blogId: blogId },
     });
 
-    const matched = keywordMaps.find(({ keyword }) =>
-      input.title.includes(keyword),
-    );
+    const matched = keywordMaps.find((map) => {
+      const title = input.title
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+      const keyword = map.keyword
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+      return title.includes(keyword);
+    });
 
     if (!matched) {
       throw new HttpError("일치하는 키워드가 없습니다.", "BAD_REQUEST");
