@@ -63,8 +63,8 @@
 |x| GET | /users/:userId/blogs/main | 사용자의 메인 블로그를 불러옵니다. |
 |x| GET | /users/:userId/posts | 사용자의 게시글 목록을 불러옵니다. |
 |x| GET | /users/:userId/liked-posts | 사용자의 좋아요한 게시글 목록을 불러옵니다. |
-|| GET | /users/:userId/followers | 사용자의 팔로워 목록을 불러옵니다. |
-|| GET | /users/:userId/followings | 사용자의 팔로잉 목록을 불러옵니다. |
+|x| GET | /users/:userId/followers | 사용자의 팔로워 목록을 불러옵니다. |
+|x| GET | /users/:userId/followings | 사용자의 팔로잉 목록을 불러옵니다. |
 |x| POST | /users/:userId/block | 사용자를 차단합니다. |
 |x| DELETE | /users/:userId/block | 사용자의 차단을 해제합니다. |
 |x| POST | /users/:userId/report | 사용자를 신고합니다. |

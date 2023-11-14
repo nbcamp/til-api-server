@@ -33,12 +33,36 @@ export const userInclude = (authUserId: number): Prisma.UserInclude => ({
   },
 });
 
-export const authUserInclude = (): Prisma.UserInclude => ({
+export const authUserInclude = (authUserId: number): Prisma.UserInclude => ({
   _count: {
     select: {
       posts: true,
-      followers: true,
-      followings: true,
+      followers: {
+        where: {
+          follower: {
+            blockeds: {
+              every: {
+                blockerId: {
+                  not: authUserId,
+                },
+              },
+            },
+          },
+        },
+      },
+      followings: {
+        where: {
+          following: {
+            blockeds: {
+              every: {
+                blockerId: {
+                  not: authUserId,
+                },
+              },
+            },
+          },
+        },
+      },
       blogs: true,
     },
   },
@@ -73,7 +97,7 @@ export async function findAuthUser(id: number) {
   try {
     return await prisma.user.findUniqueOrThrow({
       where: { id },
-      include: authUserInclude(),
+      include: authUserInclude(id),
     });
   } catch {
     throw new HttpError("사용자 정보를 찾을 수 없습니다.", "NOT_FOUND");
@@ -128,7 +152,7 @@ export function update(
   return prisma.user.update({
     where: { id },
     data: input,
-    include: authUserInclude(),
+    include: authUserInclude(id),
   });
 }
 
@@ -162,15 +186,30 @@ export async function remove(id: number) {
 }
 
 export async function findFollowers(
-  userId: number,
+  authUserId: number,
+  where: { userId: number },
   pagination?: CursorBasedPagination,
 ) {
   const { cursor, limit, sort } = pagination ?? {};
   const followerMaps = await prisma.follow.findMany({
-    where: { followingId: userId },
+    where: {
+      following: {
+        id: where.userId,
+        deletedAt: null,
+      },
+      follower: {
+        blockeds: {
+          every: {
+            blockerId: {
+              not: authUserId,
+            },
+          },
+        },
+      },
+    },
     include: {
       follower: {
-        include: userInclude(userId),
+        include: userInclude(authUserId),
       },
     },
     ...(cursor && {
@@ -184,15 +223,30 @@ export async function findFollowers(
 }
 
 export async function findFollowings(
-  userId: number,
+  authUserId: number,
+  where: { userId: number },
   pagination?: CursorBasedPagination,
 ) {
   const { cursor, limit, sort } = pagination ?? {};
   const followingMaps = await prisma.follow.findMany({
-    where: { followerId: userId },
+    where: {
+      follower: {
+        id: where.userId,
+        deletedAt: null,
+      },
+      following: {
+        blockeds: {
+          every: {
+            blockerId: {
+              not: authUserId,
+            },
+          },
+        },
+      },
+    },
     include: {
       following: {
-        include: userInclude(userId),
+        include: userInclude(authUserId),
       },
     },
     ...(cursor && {
