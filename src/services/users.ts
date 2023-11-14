@@ -151,6 +151,12 @@ export async function remove(id: number) {
       blogs: {
         deleteMany: {},
       },
+      followers: {
+        deleteMany: {},
+      },
+      followings: {
+        deleteMany: {},
+      },
     },
   });
 }
