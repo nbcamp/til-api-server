@@ -21,7 +21,8 @@ const option = { label: "ORM" };
 
 prisma.$on("query", ({ query, params, duration }) => {
   const sanitizedQuery = query
-    .replace(/`(\w+)`\./g, "")
+    .replace(/`til`\./g, "")
+    .replace(/`|`\./g, "")
     .replace(/SELECT\s+(.*)\s+FROM/, "SELECT * FROM");
   logger.info(`${sanitizedQuery} ${params} ${duration}ms`, option);
 });
