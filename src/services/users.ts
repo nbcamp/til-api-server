@@ -152,13 +152,18 @@ export async function create(input: {
 export function update(
   id: number,
   input: {
-    name?: string | null;
+    username?: string | null;
     avatarUrl?: string | null;
+    isAgreed?: boolean | null;
   },
 ) {
   return prisma.user.update({
     where: { id },
-    data: input,
+    data: {
+      username: input.username,
+      avatarUrl: input.avatarUrl,
+      isAgreed: input.isAgreed ?? false,
+    },
     include: authUserInclude(id),
   });
 }

@@ -9,6 +9,7 @@ export interface AuthUser {
   id: number;
   username: string | null;
   avatarUrl: string | null;
+  isAgreed: boolean;
   lastSignedAt: Date | null;
   lastPublishedAt?: Date | null;
   posts: number;
@@ -21,6 +22,7 @@ export interface RawAuthUser {
   id: number;
   username: string | null;
   avatarUrl: string | null;
+  isAgreed: boolean;
   lastSignedAt: Date | null;
   _count: {
     posts: number;
@@ -38,6 +40,7 @@ export function toAuthUser(raw: RawAuthUser): AuthUser {
     id: raw.id,
     username: raw.username,
     avatarUrl: raw.avatarUrl,
+    isAgreed: raw.isAgreed,
     lastSignedAt: dateToUnixTime(raw.lastSignedAt),
     lastPublishedAt: dateToUnixTime(raw.blogs[0]?.lastPublishedAt),
     posts: raw._count.posts,

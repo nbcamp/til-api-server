@@ -19,6 +19,7 @@ export const updateMyProfile = createRouter({
   descriptor: {
     username: optional(nullable("string")),
     avatarUrl: optional(nullable("string")),
+    isAgreed: optional(nullable("boolean")),
   },
   async handler(ctx): Promise<AuthUser> {
     const user = await users.update(ctx.auth.user.id, ctx.body);
