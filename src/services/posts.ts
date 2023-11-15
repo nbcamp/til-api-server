@@ -3,7 +3,10 @@ import { prisma } from "prisma";
 import { unixTimeToDate } from "utils/datetime";
 import { isBefore } from "date-fns";
 
-export function findAll(where: { userId: number; blogId?: number }) {
+export function findAll(
+  authUserId: number,
+  where: { userId: number; blogId?: number },
+) {
   return prisma.post.findMany({
     where: {
       userId: where.userId,
@@ -12,7 +15,7 @@ export function findAll(where: { userId: number; blogId?: number }) {
     include: {
       postTags: true,
       postLikes: {
-        where: { userId: where.userId },
+        where: { userId: authUserId },
         take: 1,
       },
     },

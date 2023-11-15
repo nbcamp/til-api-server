@@ -11,11 +11,6 @@ export const getMyLikedPosts = createRouter({
     const list = await likes.findAllPosts(ctx.auth.user.id, options, {
       userId: ctx.auth.user.id,
     });
-    return Promise.all(
-      list.map(({ post }) => ({
-        ...toCommunityPost(post),
-        liked: true,
-      })),
-    );
+    return Promise.all(list.map(({ post }) => toCommunityPost(post)));
   },
 });

@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { prisma } from "prisma";
 import { HttpError } from "utils/http";
+import { CursorBasedPagination } from "utils/pagination";
 
 // TODO: AuthUser Context 전달하도록 개선
 export const userInclude = (authUserId: number): Prisma.UserInclude => ({

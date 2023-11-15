@@ -6,7 +6,7 @@ export const getMyPostsByBlog = createRouter({
   description: "내 블로그의 글 목록을 가져옵니다.",
   authorized: true,
   async handler(ctx) {
-    const list = await posts.findAll({
+    const list = await posts.findAll(ctx.auth.user.id, {
       userId: ctx.auth.user.id,
       blogId: +ctx.param.blogId,
     });
