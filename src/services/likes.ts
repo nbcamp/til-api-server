@@ -12,7 +12,20 @@ export function findAllPosts(
   const { cursor, limit, sort } = pagination ?? {};
   const { userId } = where ?? {};
   return prisma.postLike.findMany({
-    where: { userId },
+    where: {
+      userId,
+      post: {
+        user: {
+          blockeds: {
+            every: {
+              blockerId: {
+                not: authUserId,
+              },
+            },
+          },
+        },
+      },
+    },
     select: {
       post: {
         include: {
