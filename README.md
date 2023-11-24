@@ -1,79 +1,142 @@
-# TIL API Server
+# 티로그 API Server
 
-## API Endpoints
+[API Documentation (Postman)](https://documenter.getpostman.com/view/30710555/2s9YXiZh7j)
 
-- [x] GET / : API 서버의 상태를 확인합니다.
+## Development
 
-### Auth
+### Getting Started
 
-- [x] POST /auth/sign-in : 사용자를 인증합니다.
+Clone the repository:
 
-### My
+```bash
+$ git clone https://github.com/nbcamp/tlog-api.git
+$ cd tlog-api
+```
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/profile | 사용자 정보를 불러옵니다. |
-|x| PATCH | /my/profile | 사용자 정보를 수정합니다. |
-|x| DELETE | /my/profile | 사용자 정보를 삭제합니다. |
+Install dependencies(using [Bun](https://bun.sh)):
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/blogs | 나의 블로그 목록을 불러옵니다. |
-|x| GET | /my/blogs/:blogId | 나의 블로그를 불러옵니다. |
-|x| GET | /my/blogs/main | 나의 메인 블로그를 불러옵니다. |
-|x| POST | /my/blogs | 나의 블로그를 생성합니다. |
-|x| PATCH | /my/blogs/:blogId | 나의 블로그를 수정합니다. |
-|x| DELETE | /my/blogs/:blogId | 나의 블로그를 삭제합니다. |
+```bash
+$ bun install
+```
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/blogs/:blogId/posts | 나의 게시글 목록을 불러옵니다. |
-|x| GET | /my/blogs/:blogId/posts/:postId | 나의 게시글을 불러옵니다. |
-|x| POST | /my/blogs/:blogId/posts | 나의 게시글을 생성합니다. |
-|x| PATCH | /my/blogs/:blogId/posts/:postId | 나의 게시글을 수정합니다. |
-|x| DELETE | /my/blogs/:blogId/posts/:postId | 나의 게시글을 삭제합니다. |
+Start the server:
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/posts | 나의 게시글 목록을 불러옵니다. |
-|x| GET | /my/posts/:postId | 나의 게시글을 불러옵니다. |
+```bash
+$ bun run start:dev
+```
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/liked-posts | 나의 좋아요한 게시글 목록을 불러옵니다. |
+### Environment Variables
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/followers | 나의 팔로워 목록을 불러옵니다. |
-|x| GET | /my/followings | 나의 팔로잉 목록을 불러옵니다. |
-|x| POST | /my/followings/:userId | 다른 사용자를 팔로잉합니다. |
-|x| DELETE | /my/followings/:userId | 다른 사용자를 언팔로잉합니다. |
-|x| DELETE | /my/followers/:userId | 나의 팔로워를 삭제합니다. |
+Set environment variables in `.env` file:
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /my/blocked-users | 나의 차단한 사용자 목록을 불러옵니다. |
+```bash
+$ cp .env.example .env
+```
 
-### Users
+For more information, see [`.env.example`](./.env.example).
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /users/:userId | 사용자 정보를 불러옵니다. |
-|x| GET | /users/:userId/blogs | 사용자의 블로그 목록을 불러옵니다. |
-|x| GET | /users/:userId/blogs/main | 사용자의 메인 블로그를 불러옵니다. |
-|x| GET | /users/:userId/posts | 사용자의 게시글 목록을 불러옵니다. |
-|x| GET | /users/:userId/liked-posts | 사용자의 좋아요한 게시글 목록을 불러옵니다. |
-|x| GET | /users/:userId/followers | 사용자의 팔로워 목록을 불러옵니다. |
-|x| GET | /users/:userId/followings | 사용자의 팔로잉 목록을 불러옵니다. |
-|x| POST | /users/:userId/block | 사용자를 차단합니다. |
-|x| DELETE | /users/:userId/block | 사용자의 차단을 해제합니다. |
-|x| POST | /users/:userId/report | 사용자를 신고합니다. |
+### Scripts
 
-### Community
+```bash
+# Start the server in development mode
+$ bun run start:dev
 
-| | Method | Path | Description |
-|-|:---|:---|:---|
-|x| GET | /community/posts | 커뮤니티의 게시글 목록을 불러옵니다. |
-|x| GET | /community/posts/:postId | 커뮤니티의 게시글을 불러옵니다. |
-|x| POST | /community/posts/:postId/likes | 커뮤니티의 게시글을 좋아요합니다. |
-|x| DELETE | /community/posts/:postId/likes | 커뮤니티의 게시글을 좋아요를 취소합니다. |
+# Migrate database
+$ bun run migrate:dev
+
+# Update packages
+$ bun run update
+
+# Lint code
+$ bun run lint
+
+# Check types
+$ bun run tsc
+```
+
+---
+
+## [Database Schema](https://dbdiagram.io/d/티로그-6526132fffbf5169f071fe0c)
+
+![Database Schema](./assets/schema.png)
+
+## Features
+
+- Restful API
+- Postman Documentation
+- FileSystem-Based API Routing
+- Body(JSON) Validation
+
+## Architecture
+
+```mermaid
+---
+title: Tech Architecture Diagram
+---
+graph TD
+  subgraph ServerDockerContainer[Docker Container]
+      BunJS[Bun.js Server]
+  end
+
+  subgraph MySQLDockerContainer[Docker Container]
+      MySQL[(MySQL)]
+  end
+
+  subgraph EC2
+      ServerDockerContainer
+      MySQLDockerContainer
+  end
+
+  subgraph S3
+      Images(Images)
+  end
+
+  subgraph AWS
+      EC2
+      S3
+  end
+
+  subgraph Clients
+      User1([User1])
+      User2([User2])
+      User3([User3])
+  end
+
+  subgraph Github
+      ClientRepo[Client Repo: Swift]
+      ServerRepo[Server Repo: JS]
+      GithubAction[[Github Action]]
+  end
+
+  subgraph DockerHub
+      BunJsImage(Bun.js Image)
+      MySQLImage(MySQL Image)
+  end
+
+  ClientRepo --Deploy--> AppStore((App Store))
+  AppStore --Distribute--> Clients
+  Clients <--HTTP--> BunJS
+  Clients --Get Images--> S3
+
+  ServerRepo --Push to main branch--> GithubAction
+  GithubAction --Deploy using SSH--> EC2
+  BunJS <--Prisma ORM--> MySQL
+
+  GithubAction --Build and Push Image--> BunJsImage
+  BunJsImage --Pull Image--> BunJS
+  MySQLImage --Pull Image--> MySQL
+
+  BunJS --Save Images--> S3
+
+  style ClientRepo fill:#f9d9ff,stroke:#333,stroke-width:2px
+  style BunJS fill:#d9f9ff,stroke:#333,stroke-width:2px
+  style MySQL fill:#d9f9ff,stroke:#333,stroke-width:2px
+  style ClientRepo fill:#d9ffd9,stroke:#333,stroke-width:2px
+  style ServerRepo fill:#d9ffd9,stroke:#333,stroke-width:2px
+  style BunJsImage fill:#ffd9d9,stroke:#333,stroke-width:2px
+  style MySQLImage fill:#ffd9d9,stroke:#333,stroke-width:2px
+  style GithubAction fill:#ffffff,stroke:#333,stroke-width:2px
+  style User1 fill:#FAF6F0,stroke:#333,stroke-width:2px
+  style User2 fill:#FAF6F0,stroke:#333,stroke-width:2px
+  style User3 fill:#FAF6F0,stroke:#333,stroke-width:2px
+```
